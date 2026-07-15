@@ -1,35 +1,71 @@
 let currentIndex = 0;
 let score = 0;
+let currentQuizArray = []; // Сюда загрузятся вопросы выбранного штата
 
-// Элементы интерфейса
 const screens = {
     start: document.getElementById('start-screen'),
+    stateSelection: document.getElementById('state-selection-screen'),
     quiz: document.getElementById('quiz-screen'),
     context: document.getElementById('context-screen'),
     result: document.getElementById('result-screen')
 };
 
 function hideAllScreens() {
-    Object.values(screens).forEach(screen => screen.classList.add('hidden'));
+    Object.values(screens).forEach(screen => {
+        if (screen) screen.classList.add('hidden');
+    });
 }
 
+// Изменено: теперь кнопка Начать открывает выбор штата
 function startGame() {
     hideAllScreens();
-    document.getElementById('total-q-num').innerText = quizData.length;
+    renderStateSelection();
+    screens.stateSelection.classList.remove('hidden');
+}
+
+// Новая функция: отрисовка кнопок штатов
+function renderStateSelection() {
+    const container = document.getElementById('states-container');
+    container.innerHTML = '';
+    
+    statesData.forEach(state => {
+        const card = document.createElement('div');
+        card.className = 'state-card';
+        card.onclick = () => startCityQuiz(state.id);
+        
+        card.innerHTML = `
+            <img src="${state.flagUrl}" alt="Флаг ${state.name}">
+            <span>${state.name}</span>
+        `;
+        container.appendChild(card);
+    });
+}
+
+// Новая функция: запуск квиза по конкретному штату
+function startCityQuiz(stateId) {
+    currentQuizArray = quizData[stateId];
+    
+    if (!currentQuizArray || currentQuizArray.length === 0) {
+        alert("Вопросы для городов этого штата пока не добавлены!");
+        return;
+    }
+    
+    currentIndex = 0;
+    score = 0;
+    
+    hideAllScreens();
+    document.getElementById('total-q-num').innerText = currentQuizArray.length;
     screens.quiz.classList.remove('hidden');
     loadQuestion();
 }
 
 function loadQuestion() {
-    const currentData = quizData[currentIndex];
+    const currentData = currentQuizArray[currentIndex];
     document.getElementById('current-q-num').innerText = currentIndex + 1;
-    
-    // Загружаем флаг
     document.getElementById('flag-image').src = currentData.flagUrl;
     
-    // Генерируем кнопки
     const optionsContainer = document.getElementById('options-container');
-    optionsContainer.innerHTML = ''; // Очищаем старые
+    optionsContainer.innerHTML = ''; 
     
     currentData.options.forEach(option => {
         const btn = document.createElement('button');
@@ -49,15 +85,13 @@ function checkAnswer(selectedOption, currentData) {
         document.getElementById('result-badge').innerText = 'Верно!';
     } else {
         document.getElementById('result-badge').style.backgroundColor = '#ce1126';
-        document.getElementById('result-badge').innerText = `Ошибка. Правильный ответ: ${currentData.correct}`;
+        document.getElementById('result-badge').innerText = `Ошибка. Ответ: ${currentData.correct}`;
     }
 
-    // Заполняем историческую справку
     document.getElementById('context-city-name').innerText = currentData.name;
     document.getElementById('context-history').innerText = currentData.history;
     document.getElementById('context-symbolism').innerText = currentData.symbolism;
 
-    // Переключаем экраны
     hideAllScreens();
     screens.context.classList.remove('hidden');
 }
@@ -66,13 +100,12 @@ function nextQuestion() {
     currentIndex++;
     hideAllScreens();
     
-    if (currentIndex < quizData.length) {
+    if (currentIndex < currentQuizArray.length) {
         screens.quiz.classList.remove('hidden');
         loadQuestion();
     } else {
-        // Конец квиза
         document.getElementById('score-display').innerText = score;
-        document.getElementById('total-score-display').innerText = quizData.length;
+        document.getElementById('total-score-display').innerText = currentQuizArray.length;
         screens.result.classList.remove('hidden');
     }
 }
