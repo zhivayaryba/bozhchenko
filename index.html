@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Квиз: Флаги Бразилии</title>
+    <title>Cidades</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,6 +16,14 @@
         <button class="primary-btn" onclick="startGame()">Начать квиз</button>
     </div>
 
+    <div id="state-selection-screen" class="screen hidden">
+        <h2>Выберите штат</h2>
+        <p style="margin-bottom: 20px; color: #666;">Чтобы начать квиз по флагам его городов</p>
+        
+        <div class="states-grid" id="states-container">
+            </div>
+    </div>
+    
     <div id="quiz-screen" class="screen hidden">
         <div class="progress">Вопрос <span id="current-q-num">1</span> из <span id="total-q-num">10</span></div>
         <h2 id="question-text">Какому штату принадлежит этот флаг?</h2>
