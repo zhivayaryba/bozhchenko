@@ -1,0 +1,35 @@
+<div class="quiz-container">
+  <!-- Левая колонка: Викторина -->
+  <div class="quiz-section">
+    <div class="progress-bar">Вопрос 1 из 10</div>
+    <h2 id="question-text">Чей это флаг?</h2>
+    
+    <div class="flag-display">
+      <img id="flag-image" src="" alt="Флаг города">
+    </div>
+
+    <div class="options-grid" id="options-container">
+      <!-- Кнопки будут генерироваться через JS -->
+    </div>
+  </div>
+
+  <!-- Правая колонка: Исторический контекст (скрыта по умолчанию) -->
+  <div class="context-section hidden" id="context-panel">
+    <div id="result-badge" class="badge"></div>
+    
+    <h3 id="context-city-name">Название города</h3>
+    <img id="map-image" src="" alt="Карта локации">
+    
+    <div class="info-block">
+      <h4>📖 История</h4>
+      <p id="context-history"></p>
+    </div>
+
+    <div class="info-block">
+      <h4>🛡️ Символика флага</h4>
+      <p id="context-symbolism"></p>
+    </div>
+
+    <button id="next-btn" onclick="nextQuestion()">Следующий флаг ➔</button>
+  </div>
+</div>
