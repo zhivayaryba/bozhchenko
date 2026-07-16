@@ -28,12 +28,25 @@ window.changeLanguage = function(lang) {
         el.innerText = t(key);
     });
 
-    // БЕЗОПАСНАЯ ПРОВЕРКА: обращаемся к classList только если элемент найден
     if (screens.stateSelection && !screens.stateSelection.classList.contains('hidden')) {
         renderStateSelection();
     }
     
-    // Обновляем кнопку старта
+    // ДОБАВЛЕННЫЙ БЛОК: Динамический перевод текста на экране контекста
+    if (screens.context && !screens.context.classList.contains('hidden') && activeTargetCity) {
+        document.getElementById('context-symbolism').innerText = activeTargetCity.hist;
+        
+        const mottoCont = document.getElementById('motto-container');
+        const translatedMotto = activeTargetCity.motto; // Вызовет геттер с новым языком
+        
+        if (translatedMotto && translatedMotto.trim() !== "") {
+            mottoCont.style.display = 'block';
+            document.getElementById('context-motto').innerText = translatedMotto;
+        } else {
+            mottoCont.style.display = 'none';
+        }
+    }
+    
     const startBtn = document.getElementById('start-btn');
     if (startBtn && !startBtn.disabled) {
         startBtn.innerText = t("uid_start_btn");
@@ -85,6 +98,7 @@ const quizData = {
 };
 
 let currentIndex = 0;
+let activeTargetCity = null; // Запоминает город, который мы сейчас рассматриваем
 let score = 0;
 let currentQuizArray = [];
 
@@ -256,7 +270,9 @@ function loadQuestion() {
 }
 
 function checkAnswer(selectedCityId, targetCity) {
+    activeTargetCity = targetCity; // <--- ДОБАВИТЬ ЭТО
     const isCorrect = (selectedCityId === targetCity.city);
+    // ... остальной код функции
     
     // 1. ПОДСВЕТКА КНОПОК
     const options = document.querySelectorAll('#options-container button');
