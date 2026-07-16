@@ -87,11 +87,11 @@ let score = 0;
 let currentQuizArray = [];
 
 const screens = {
-    start: document.getElementById('start-screen'),
-    stateSelection: document.getElementById('state-selection-screen'),
-    quiz: document.getElementById('quiz-screen'),
-    context: document.getElementById('context-screen'),
-    result: document.getElementById('result-screen')
+    get start() { return document.getElementById('start-screen'); },
+    get stateSelection() { return document.getElementById('state-selection-screen'); },
+    get quiz() { return document.getElementById('quiz-screen'); },
+    get context() { return document.getElementById('context-screen'); },
+    get result() { return document.getElementById('result-screen'); }
 };
 
 // --- ФУНКЦИИ ЗАГРУЗКИ ---
