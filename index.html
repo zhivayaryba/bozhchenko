@@ -1,35 +1,43 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cidades</title>
+    <title id="page-title" data-i18n="uid_page_title">Квиз</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<div style="position: absolute; top: 15px; right: 15px; z-index: 100;">
+    <button onclick="changeLanguage('portuguese')" style="padding: 5px 10px; cursor: pointer; border-radius: 4px; border: 1px solid #ccc;">PT</button>
+    <button onclick="changeLanguage('english')" style="padding: 5px 10px; cursor: pointer; border-radius: 4px; border: 1px solid #ccc;">EN</button>
+</div>
+
 <div class="app-container">
     
     <div id="start-screen" class="screen">
-        <h1>🇧🇷 Флаги штатов Бразилии</h1>
-        <p>Проверьте свои знания и узнайте историю символики каждого региона.</p>
-        <button class="primary-btn" onclick="startGame()">Начать квиз</button>
+        <h1 data-i18n="uid_main_title"></h1>
+        <p data-i18n="uid_main_desc"></p>
+        <button class="primary-btn" id="start-btn" data-i18n="uid_loading_btn" onclick="startGame()"></button>
     </div>
 
     <div id="state-selection-screen" class="screen hidden">
-        <h2>Выберите штат</h2>
-        <p style="margin-bottom: 20px; color: #666;">Чтобы начать квиз по флагам его городов</p>
+        <h2 data-i18n="uid_select_state_title"></h2>
+        <p style="margin-bottom: 20px; color: #666;" data-i18n="uid_select_state_desc"></p>
         
         <div class="states-grid" id="states-container">
             </div>
     </div>
-    
+
     <div id="quiz-screen" class="screen hidden">
-        <div class="progress">Вопрос <span id="current-q-num">1</span> из <span id="total-q-num">10</span></div>
-        <h2 id="question-text">Какому штату принадлежит этот флаг?</h2>
+        <div class="progress">
+            <span data-i18n="uid_question_prefix"></span> <span id="current-q-num">1</span> 
+            <span data-i18n="uid_question_separator"></span> <span id="total-q-num">10</span>
+        </div>
+        <h2 id="question-text" data-i18n="uid_question_text"></h2>
         
         <div class="flag-container">
-            <img id="flag-image" src="" alt="Флаг">
+            <img id="flag-image" src="" alt="Flag">
         </div>
 
         <div class="options-grid" id="options-container">
@@ -38,34 +46,23 @@
 
     <div id="context-screen" class="screen hidden">
         <div id="result-badge" class="badge"></div>
-        <h2 id="context-city-name">Название штата</h2>
+        <h2 id="context-city-name"></h2>
         
         <div class="info-card">
-            <h3>📖 История</h3>
+            <h3 data-i18n="uid_history_title"></h3>
             <p id="context-history"></p>
         </div>
 
         <div class="info-card">
-            <h3>🛡️ Символика</h3>
+            <h3 data-i18n="uid_symbolism_title"></h3>
             <p id="context-symbolism"></p>
         </div>
 
-        <button class="primary-btn" onclick="nextQuestion()">Продолжить ➔</button>
+        <button class="primary-btn" data-i18n="uid_continue_btn" onclick="nextQuestion()"></button>
     </div>
 
     <div id="result-screen" class="screen hidden">
-        <h2>Квиз завершен!</h2>
-        <p>Вы ответили правильно на <span id="score-display">0</span> из <span id="total-score-display">0</span> вопросов.</p>
-        <button class="primary-btn" onclick="location.reload()">Пройти еще раз</button>
-    </div>
-
-</div>
-
-<script src="data.js"></script>
-<script src="script.js"></script>
-</body>
-    <div style="position: absolute; top: 15px; right: 15px; z-index: 100;">
-    <button onclick="changeLanguage('portuguese')" style="padding: 5px 10px; cursor: pointer;">PT</button>
-    <button onclick="changeLanguage('english')" style="padding: 5px 10px; cursor: pointer;">EN</button>
-</div>
-</html>
+        <h2 data-i18n="uid_finish_title"></h2>
+        <p>
+            <span data-i18n="uid_result_text_1"></span> 
+            <span id="score-display"
