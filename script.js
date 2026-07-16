@@ -405,8 +405,10 @@ function initLoupeEffect(flagUrl, coatUrl, containerId, lensId, imgId) {
 
     if (!container || !lens || !img) return;
 
-    // Защита от пустых ячеек
+    // ВАЖНО: используем coatUrl, если он есть и не пустой
     const cleanCoatUrl = (coatUrl && coatUrl.trim() !== "") ? coatUrl.trim() : flagUrl;
+    
+    // Присваиваем именно очищенный coatUrl
     lens.style.backgroundImage = `url('${cleanCoatUrl}')`;
 
     function applyLensSize() {
@@ -416,6 +418,7 @@ function initLoupeEffect(flagUrl, coatUrl, containerId, lensId, imgId) {
         }
     }
 
+    
     if (img.complete) {
         applyLensSize();
     } else {
