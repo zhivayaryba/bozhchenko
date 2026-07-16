@@ -36,17 +36,25 @@ window.changeLanguage = function(lang) {
     if (screens.context && !screens.context.classList.contains('hidden') && activeTargetCity) {
         document.getElementById('context-symbolism').innerText = activeTargetCity.hist;
 
-        // Логика мотто
+        // Логика мотто (бронебойная проверка)
         const mottoCont = document.getElementById('motto-container');
-        const mottoKey = activeTargetCity.mottoKey; // Берем оригинальный ключ
-        const translatedMotto = activeTargetCity.motto; // Берем попытку перевода
-        
-        // Показываем только если: ключ есть И перевод не равен ключу И перевод не пустой
-        if (mottoKey && translatedMotto !== mottoKey && translatedMotto.trim() !== "") {
-            mottoCont.style.display = 'block';
-            document.getElementById('context-motto').innerText = translatedMotto;
+        const mottoKey = activeTargetCity.mottoKey; // Оригинальный ключ из таблицы
+        const translatedMotto = activeTargetCity.motto; // Попытка перевода
+
+        // 1. Очищаем от пробелов, табов и \r\n
+        const cleanKey = mottoKey ? mottoKey.trim() : "";
+        const cleanTranslation = translatedMotto ? translatedMotto.trim() : "";
+
+        // 2. Блокируем, если:
+        // - Ключ пустой
+        // - Ключ равен "N/A" (если вы так заполняли таблицу)
+        // - Перевод равен самому ключу (нет в словаре)
+        // - Перевод пустой
+        if (!cleanKey || cleanKey.toUpperCase() === "N/A" || cleanTranslation === cleanKey || cleanTranslation === "") {
+            mottoCont.style.display = 'none'; // Жестко прячем блок
         } else {
-            mottoCont.style.display = 'none';
+            mottoCont.style.display = 'block';
+            document.getElementById('context-motto').innerText = cleanTranslation;
         }
     }
     
