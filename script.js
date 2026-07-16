@@ -28,12 +28,12 @@ window.changeLanguage = function(lang) {
         el.innerText = t(key);
     });
 
-    // Перерисовываем карточки штатов, если мы на экране выбора
-    if (!screens.stateSelection.classList.contains('hidden')) {
+    // БЕЗОПАСНАЯ ПРОВЕРКА: обращаемся к classList только если элемент найден
+    if (screens.stateSelection && !screens.stateSelection.classList.contains('hidden')) {
         renderStateSelection();
     }
     
-    // Обновляем кнопку старта, если мы на стартовом экране
+    // Обновляем кнопку старта
     const startBtn = document.getElementById('start-btn');
     if (startBtn && !startBtn.disabled) {
         startBtn.innerText = t("uid_start_btn");
