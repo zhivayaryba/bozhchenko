@@ -394,19 +394,22 @@ function setupMap(coordString) {
     L.marker([lat, lon]).addTo(mapInstance);
 }
 
-function initLoupeEffect(flagUrl, coatUrl) {
-    const container = document.getElementById('flag-zoom-container');
-    const lens = document.getElementById('zoom-lens');
-    const img = document.getElementById('context-flag-image');
+function initLoupeEffect(flagUrl, coatUrl, containerId, lensId, imgId) {
+    const container = document.getElementById(containerId);
+    const lens = document.getElementById(lensId);
+    const img = document.getElementById(imgId);
 
-    // Защита от пустых ячеек с пробелами из TSV
+    if (!container || !lens || !img) return;
+
+    // Защита от пустых ячеек
     const cleanCoatUrl = (coatUrl && coatUrl.trim() !== "") ? coatUrl.trim() : flagUrl;
     lens.style.backgroundImage = `url('${cleanCoatUrl}')`;
 
-    // ВАЖНО: Вычисляем размер лупы ТОЛЬКО когда картинка флага реально загрузилась
     function applyLensSize() {
-        // Увеличиваем масштаб в 1.5 раза от текущего размера флага
-        lens.style.backgroundSize = `${img.clientWidth * 1.5}px`; 
+        // Вычисляем масштаб только если картинка имеет ширину больше 0
+        if (img.clientWidth > 0) {
+            lens.style.backgroundSize = `${img.clientWidth * 1.5}px`; 
+        }
     }
 
     if (img.complete) {
