@@ -256,21 +256,28 @@ function checkAnswer(selectedCityId, targetCity) {
     const isCorrect = (selectedCityId === targetCity.city);
     const resultBadge = document.getElementById('result-badge');
     
-    // Заполняем данные
+    // Заполняем основные данные
     document.getElementById('context-flag-image').src = targetCity.flagData.url;
     document.getElementById('context-city-name').innerText = targetCity.name;
     
-    // ВАЖНО: меняем местами поля
-    document.getElementById('context-symbolism').innerText = targetCity.hist; // Теперь тут Символизм
+    // 1. Устанавливаем Символизм (ранее History)
+    document.getElementById('context-symbolism').innerText = targetCity.hist; 
     
+    // 2. Логика для Мотто
     const mottoCont = document.getElementById('motto-container');
-    if (targetCity.motto) {
+    const mottoText = targetCity.motto; // Получаем значение из таблицы
+    
+    // Проверяем: если t(mottoText) вернуло пустоту или сам текст пуст
+    const translatedMotto = t(mottoText);
+    
+    if (translatedMotto && translatedMotto.trim() !== "") {
         mottoCont.style.display = 'block';
-        document.getElementById('context-motto').innerText = targetCity.motto; // Теперь тут Мотто
+        document.getElementById('context-motto').innerText = translatedMotto;
     } else {
         mottoCont.style.display = 'none';
     }
 
+    // Обработка правильности
     if (isCorrect) {
         score++;
         resultBadge.innerText = t("uid_correct");
