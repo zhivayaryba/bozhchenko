@@ -75,11 +75,16 @@ button {
 
 .primary-btn {
     padding: 15px 30px;
-    background: #0055A4; /* Синий цвет Бразилии */
+    background: #0055A4;
     color: white;
     border: none;
     margin-top: 20px;
-    width: 100%;
+    /* width: 100%; <--- УДАЛИТЬ ЭТО */
+    min-width: 250px; /* <--- ДОБАВИТЬ ЭТО */
+    border-radius: 8px; /* Добавим скругление для красоты */
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .primary-btn:hover {
