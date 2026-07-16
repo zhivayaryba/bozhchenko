@@ -64,11 +64,11 @@ window.changeLanguage = function(lang) {
     }
 };
 
-// --- НАШИ КЛАССЫ ДАННЫХ ---
 class FlagData {
-    constructor(url, coord) {
+    constructor(url, coord, coatUrl) {
         this.url = url;
         this.coord = coord;
+        this.coatUrl = coatUrl; // Теперь это здесь
     }
 }
 
@@ -88,15 +88,14 @@ class StateData {
 }
 
 class CidadeData {
-    constructor(cityId, stateId, nameKey, mottoKey, histKey, flagData, coatUrl) {
+    constructor(cityId, stateId, nameKey, mottoKey, histKey, flagData) {
         this.city = cityId;
         this.state = stateId;
         this.nameKey = nameKey;
         this.mottoKey = mottoKey;
         this.histKey = histKey;
-        this.flagData = flagData;
-        this.coatUrl = coatUrl;
-    } // <--- ВОТ ЭТА СКОБКА ВЕРОЯТНО БЫЛА УДАЛЕНА!
+        this.flagData = flagData; // Здесь лежит и url, и coord, и coatUrl
+    }
 
     get name() { return t(this.nameKey); }
     get motto() { return t(this.mottoKey); }
@@ -176,10 +175,11 @@ async function initializeApp() {
         // 3. Города
         const parsedCidades = parseTSV(cidadesText);
         parsedCidades.forEach(row => {
-            const flag = new FlagData(row.url, row.coord); 
-            // ВАЖНО: добавили row.coat_url в конец! (Проверьте, чтобы столбец в таблице назывался coat_url)
-            const city = new CidadeData(row.city, row.state, row.name, row.motto, row.hist, flag, row.coat_url);
-            quizData.cidadeData.push(city);
+        // Создаем объект флага с учетом coat_url
+        const flag = new FlagData(row.url, row.coord, row.coat_url); 
+        // Теперь передаем в конструктор города только cityId, stateId, nameKey, mottoKey, histKey и flag
+        const city = new CidadeData(row.city, row.state, row.name, row.motto, row.hist, flag);
+        quizData.cidadeData.push(city);
         });
 
         // Применяем язык по умолчанию ко всему интерфейсу
@@ -262,7 +262,7 @@ function loadQuestion() {
     document.getElementById('flag-image').src = targetCity.flagData.url;
 
     // Запускаем лупу для экрана вопроса
-    initLoupeEffect(targetCity.flagData.url, targetCity.coatUrl, 'quiz-flag-zoom-container', 'quiz-zoom-lens', 'flag-image');
+    initLoupeEffect(targetCity.flagData.url, targetCity.flagData.coatUrl, 'quiz-flag-zoom-container', 'quiz-zoom-lens', 'flag-image');
     
     const allCitiesInState = quizData.cidadeData.filter(city => city.state === targetCity.state);
     const otherCities = allCitiesInState.filter(city => city.city !== targetCity.city);
@@ -345,7 +345,7 @@ function checkAnswer(selectedCityId, targetCity) {
                 setupMap(targetCity.coord);
             }
             // Запускаем лупу для экрана справки (ОБНОВЛЕННЫЙ ВЫЗОВ)
-            initLoupeEffect(targetCity.flagData.url, targetCity.coatUrl, 'flag-zoom-container', 'zoom-lens', 'context-flag-image');
+            initLoupeEffect(targetCity.flagData.url, targetCity.flagData.coatUrl, 'flag-zoom-container', 'zoom-lens', 'context-flag-image');
         }, 150);
 
     }, 1000); // 1 секунда задержки
