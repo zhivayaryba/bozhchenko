@@ -147,3 +147,17 @@ button {
     font-weight: 500;
     color: #333;
 }
+
+.context-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#context-flag-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
