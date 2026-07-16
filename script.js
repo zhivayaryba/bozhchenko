@@ -344,7 +344,8 @@ function checkAnswer(selectedCityId, targetCity) {
             if (targetCity.coord) {
                 setupMap(targetCity.coord);
             }
-            initLoupeEffect(targetCity.flagData.url, targetCity.coatUrl);
+            // Запускаем лупу для экрана справки (ОБНОВЛЕННЫЙ ВЫЗОВ)
+            initLoupeEffect(targetCity.flagData.url, targetCity.coatUrl, 'flag-zoom-container', 'zoom-lens', 'context-flag-image');
         }, 150);
 
     }, 1000); // 1 секунда задержки
