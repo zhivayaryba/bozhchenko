@@ -256,18 +256,27 @@ function checkAnswer(selectedCityId, targetCity) {
     const isCorrect = (selectedCityId === targetCity.city);
     const resultBadge = document.getElementById('result-badge');
     
-    if (isCorrect) {
-        score++;
-        resultBadge.style.backgroundColor = '#009c3b';
-        resultBadge.innerText = t("uid_correct");
+    // Заполняем данные
+    document.getElementById('context-flag-image').src = targetCity.flagData.url;
+    document.getElementById('context-city-name').innerText = targetCity.name;
+    
+    // ВАЖНО: меняем местами поля
+    document.getElementById('context-symbolism').innerText = targetCity.hist; // Теперь тут Символизм
+    
+    const mottoCont = document.getElementById('motto-container');
+    if (targetCity.motto) {
+        mottoCont.style.display = 'block';
+        document.getElementById('context-motto').innerText = targetCity.motto; // Теперь тут Мотто
     } else {
-        resultBadge.style.backgroundColor = '#ce1126';
-        resultBadge.innerText = t("uid_wrong") + " " + targetCity.name;
+        mottoCont.style.display = 'none';
     }
 
-    document.getElementById('context-city-name').innerText = targetCity.name;
-    document.getElementById('context-history').innerText = targetCity.hist;
-    document.getElementById('context-symbolism').innerText = targetCity.motto;
+    if (isCorrect) {
+        score++;
+        resultBadge.innerText = t("uid_correct");
+    } else {
+        resultBadge.innerText = t("uid_wrong") + " " + targetCity.name;
+    }
 
     hideAllScreens();
     screens.context.classList.remove('hidden');
