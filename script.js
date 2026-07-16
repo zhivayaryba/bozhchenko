@@ -260,6 +260,9 @@ function loadQuestion() {
     const targetCity = currentQuizArray[currentIndex];
     document.getElementById('current-q-num').innerText = currentIndex + 1;
     document.getElementById('flag-image').src = targetCity.flagData.url;
+
+    // Запускаем лупу для экрана вопроса
+    initLoupeEffect(targetCity.flagData.url, targetCity.coatUrl, 'quiz-flag-zoom-container', 'quiz-zoom-lens', 'flag-image');
     
     const allCitiesInState = quizData.cidadeData.filter(city => city.state === targetCity.state);
     const otherCities = allCitiesInState.filter(city => city.city !== targetCity.city);
