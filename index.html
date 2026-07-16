@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title" data-i18n="uid_page_title">Квиз</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <link rel="stylesheet" href="style.css">
 </head>
-    <script src="script.js"></script>
 <body>
 
 <div style="position: absolute; top: 15px; right: 15px; z-index: 100;">
@@ -25,9 +28,7 @@
     <div id="state-selection-screen" class="screen hidden">
         <h2 data-i18n="uid_select_state_title"></h2>
         <p style="margin-bottom: 20px; color: #666;" data-i18n="uid_select_state_desc"></p>
-        
-        <div class="states-grid" id="states-container">
-            </div>
+        <div class="states-grid" id="states-container"></div>
     </div>
 
     <div id="quiz-screen" class="screen hidden">
@@ -41,55 +42,57 @@
             <img id="flag-image" src="" alt="Flag">
         </div>
 
-        <div class="options-grid" id="options-container">
-            </div>
+        <div class="options-grid" id="options-container"></div>
     </div>
 
-<!-- ЭКРАН 3: Исторический контекст -->
-<div id="context-screen" class="screen hidden">
-    <div id="result-badge" class="badge"></div>
-    <h2 id="context-city-name" style="text-align: center; width: 100%; margin-bottom: 20px;"></h2>
-    
-    <!-- ТРИ КОЛОНКИ -->
-    <div class="context-grid-3col">
+    <div id="context-screen" class="screen hidden">
+        <div id="result-badge" class="badge"></div>
+        <h2 id="context-city-name" style="text-align: center; width: 100%; margin-bottom: 20px;"></h2>
         
-        <!-- ЛЕВАЯ: Карта -->
-        <div class="panel-left">
-            <div id="city-map"></div>
-        </div>
-        
-        <!-- ЦЕНТР: Флаг с эффектом лупы -->
-        <div class="panel-center">
-            <div class="zoom-container" id="flag-zoom-container">
-                <img id="context-flag-image" src="" alt="Flag">
-                <!-- Это сама "линза" лупы -->
-                <div id="zoom-lens" class="lens hidden"></div>
+        <div class="context-grid-3col">
+            
+            <div class="panel-left">
+                <div id="city-map"></div>
             </div>
-        </div>
-        
-        <!-- ПРАВАЯ: Текст -->
-        <div class="panel-right">
-            <div class="info-card">
-                <h3 data-i18n="uid_symbolism_title"></h3>
-                <p id="context-symbolism"></p>
+            
+            <div class="panel-center">
+                <div class="zoom-container" id="flag-zoom-container">
+                    <img id="context-flag-image" src="" alt="Flag">
+                    <div id="zoom-lens" class="lens hidden"></div>
+                </div>
             </div>
-            <div class="info-card" id="motto-container">
-                <h3 data-i18n="uid_motto_title"></h3>
-                <p id="context-motto"></p>
+            
+            <div class="panel-right">
+                <div class="info-card">
+                    <h3 data-i18n="uid_symbolism_title"></h3>
+                    <p id="context-symbolism"></p>
+                </div>
+                <div class="info-card" id="motto-container">
+                    <h3 data-i18n="uid_motto_title"></h3>
+                    <p id="context-motto"></p>
+                </div>
             </div>
+
         </div>
 
+        <div style="text-align: center; width: 100%; margin-top: 20px;">
+            <button class="primary-btn" data-i18n="uid_continue_btn" onclick="nextQuestion()"></button>
+        </div>
     </div>
 
-    <div style="text-align: center; width: 100%; margin-top: 20px;">
-        <button class="primary-btn" data-i18n="uid_continue_btn" onclick="nextQuestion()"></button>
-    </div>
-</div>
     <div id="result-screen" class="screen hidden">
         <h2 data-i18n="uid_finish_title"></h2>
-        <p>
+        <p style="font-size: 1.2rem; margin: 20px 0;">
             <span data-i18n="uid_result_text_1"></span> 
-            <span id="score-display"
-    <!-- Подключаем стили и скрипты для карты OpenStreetMap -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            <strong id="score-display">0</strong> 
+            <span data-i18n="uid_result_text_2"></span> <strong id="total-score-display">10</strong>
+        </p>
+        
+        <button class="primary-btn" data-i18n="uid_restart_btn" onclick="startGame()"></button>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
