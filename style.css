@@ -17,7 +17,7 @@ body {
 .app-container {
     background: #ffffff;
     width: 100%;
-    max-width: 600px;
+    max-width: 1200px; /* Увеличили для вместимости 3 колонок */
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     padding: 30px;
@@ -105,9 +105,20 @@ button {
 }
 
 /* Адаптация для мобильных */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .options-grid {
-        grid-template-columns: 1fr; /* На телефоне кнопки будут в один столбик */
+        grid-template-columns: 1fr;
+    }
+    
+    /* Делаем три колонки одним столбцом на телефоне */
+    .context-grid-3col {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    /* Уменьшаем карту для телефона */
+    #city-map {
+        height: 200px; 
     }
 }
 
@@ -156,33 +167,6 @@ button {
     padding: 20px;
 }
 
-.context-wrapper {
-    display: flex;
-    flex-direction: row; /* Текст будет справа от флага */
-    justify-content: center;
-    align-items: flex-start;
-    gap: 40px;
-    width: 100%;
-    max-width: 900px;
-}
-
-.context-flag {
-    flex: 0 0 auto; /* Флаг не сжимается */
-    display: flex;
-    justify-content: center;
-}
-
-#context-flag-image {
-    max-width: 300px; /* Фиксируем размер флага, чтобы он не менялся */
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.context-info {
-    flex: 1; /* Текст занимает оставшееся место */
-    max-width: 400px;
-}
 /* Трехколоночная сетка */
 .context-grid-3col {
     display: grid;
