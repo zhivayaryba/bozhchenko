@@ -9,30 +9,35 @@ const translations = {
     portuguese: {},
     english: {}
 };
-let currentLang = 'portuguese'; // Язык по умолчанию
+let currentLang = 'portuguese';
 
-// Функция, которая ищет перевод по ключу
 function t(key) {
     if (!key) return "";
     if (translations[currentLang] && translations[currentLang][key]) {
         return translations[currentLang][key];
     }
-    return key; // Если перевода нет, вернет сам ключ
+    return key; 
 }
 
-// Глобальная функция смены языка интерфейса
 window.changeLanguage = function(lang) {
     currentLang = lang;
     
-    // Обновляем статические тексты в интерфейсе (если добавите ключи для кнопок/заголовков)
+    // Обновляем все статические тексты на странице
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         el.innerText = t(key);
     });
 
-    // Перерисовываем текущий экран
-    if (!screens.stateSelection.classList.contains('hidden')) renderStateSelection();
-    // Логику перерисовки самого квиза можно добавить при необходимости
+    // Перерисовываем карточки штатов, если мы на экране выбора
+    if (!screens.stateSelection.classList.contains('hidden')) {
+        renderStateSelection();
+    }
+    
+    // Обновляем кнопку старта, если мы на стартовом экране
+    const startBtn = document.getElementById('start-btn');
+    if (startBtn && !startBtn.disabled) {
+        startBtn.innerText = t("uid_start_btn");
+    }
 };
 
 // --- НАШИ КЛАССЫ ДАННЫХ ---
@@ -45,7 +50,6 @@ class FlagData {
 
 class StateData {
     constructor(stateId, nameKey, mottoKey, histKey, capitalKey, flagData) {
-        if (!(flagData instanceof FlagData)) throw new Error(`Ошибка во флагах штата ${stateId}`);
         this.state = stateId;
         this.nameKey = nameKey;
         this.mottoKey = mottoKey;
@@ -53,7 +57,6 @@ class StateData {
         this.capitalKey = capitalKey;
         this.flagData = flagData;
     }
-    // Геттеры автоматически возвращают переведенный текст
     get name() { return t(this.nameKey); }
     get motto() { return t(this.mottoKey); }
     get hist() { return t(this.histKey); }
@@ -62,7 +65,6 @@ class StateData {
 
 class CidadeData {
     constructor(cityId, stateId, nameKey, mottoKey, histKey, flagData) {
-        if (!(flagData instanceof FlagData)) throw new Error(`Ошибка во флагах города ${nameKey}`);
         this.city = cityId;
         this.state = stateId;
         this.nameKey = nameKey;
@@ -108,10 +110,11 @@ function parseTSV(tsvText) {
 }
 
 async function initializeApp() {
-    const startBtn = document.querySelector('#start-screen .primary-btn');
+    const startBtn = document.getElementById('start-btn');
     if (startBtn) {
         startBtn.disabled = true;
-        startBtn.innerText = "Загрузка...";
+        // Заглушка до того, как загрузятся словари (потом переведется)
+        startBtn.innerText = "Carregando..."; 
     }
 
     try {
@@ -125,7 +128,7 @@ async function initializeApp() {
         const cidadesText = await cidadesRes.text();
         const locText = await locRes.text();
 
-        // 1. Сначала парсим локализацию, чтобы словари были готовы
+        // 1. Локализация
         const parsedLoc = parseTSV(locText);
         parsedLoc.forEach(row => {
             const key = row.ui;
@@ -135,7 +138,7 @@ async function initializeApp() {
             }
         });
 
-        // 2. Парсим Штаты (используем новые имена столбцов: url, coord)
+        // 2. Штаты
         const parsedStates = parseTSV(statesText);
         parsedStates.forEach(row => {
             const flag = new FlagData(row.url, row.coord);
@@ -143,7 +146,7 @@ async function initializeApp() {
             quizData.stateData.push(state);
         });
 
-        // 3. Парсим Города
+        // 3. Города
         const parsedCidades = parseTSV(cidadesText);
         parsedCidades.forEach(row => {
             const flag = new FlagData(row.url, row.coord); 
@@ -151,15 +154,20 @@ async function initializeApp() {
             quizData.cidadeData.push(city);
         });
 
+        // Применяем язык по умолчанию ко всему интерфейсу
+        changeLanguage(currentLang);
+
         if (startBtn) {
             startBtn.disabled = false;
-            // Можно добавить стартовой кнопке ключ в localization таблице
-            startBtn.innerText = t("ui_start_btn") || "Начать квиз"; 
         }
 
     } catch (error) {
         console.error(error);
-        if (startBtn) startBtn.innerText = "Ошибка загрузки";
+        // Если словари не загрузились, обращаемся к t(), но он вернет ключ.
+        // Поэтому для ошибки критического сбоя можно оставить хардкод, либо надеяться на словарь.
+        if (startBtn) {
+            startBtn.innerText = t("uid_error_loading"); 
+        }
     }
 }
 
@@ -185,9 +193,8 @@ function renderStateSelection() {
         card.className = 'state-card';
         card.onclick = () => startCityQuiz(stateObj.state);
         
-        // stateObj.name автоматически переводится геттером внутри класса
         card.innerHTML = `
-            <img src="${stateObj.flagData.url}" alt="Флаг">
+            <img src="${stateObj.flagData.url}" alt="Flag">
             <span>${stateObj.name}</span>
         `;
         container.appendChild(card);
@@ -207,7 +214,7 @@ function startCityQuiz(stateId) {
     const citiesInState = quizData.cidadeData.filter(city => city.state === stateId);
     
     if (citiesInState.length < 4) {
-        alert("Минимум 4 города!");
+        alert(t("uid_error_min_cities"));
         return;
     }
 
@@ -230,7 +237,6 @@ function loadQuestion() {
     const otherCities = allCitiesInState.filter(city => city.city !== targetCity.city);
     const wrongCities = shuffleArray(otherCities).slice(0, 3);
     
-    // Сохраняем ключи объектов для генерации кнопок
     let optionsObjects = [targetCity, ...wrongCities];
     optionsObjects = shuffleArray(optionsObjects); 
     
@@ -240,9 +246,7 @@ function loadQuestion() {
     optionsObjects.forEach(cityObj => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
-        // Имя берется через геттер и переводится автоматически
         btn.innerText = cityObj.name; 
-        // Валидация по ID города (city)
         btn.onclick = () => checkAnswer(cityObj.city, targetCity);
         optionsContainer.appendChild(btn);
     });
@@ -250,19 +254,20 @@ function loadQuestion() {
 
 function checkAnswer(selectedCityId, targetCity) {
     const isCorrect = (selectedCityId === targetCity.city);
+    const resultBadge = document.getElementById('result-badge');
     
     if (isCorrect) {
         score++;
-        document.getElementById('result-badge').style.backgroundColor = '#009c3b';
-        document.getElementById('result-badge').innerText = t("ui_correct") || 'Верно!';
+        resultBadge.style.backgroundColor = '#009c3b';
+        resultBadge.innerText = t("uid_correct");
     } else {
-        document.getElementById('result-badge').style.backgroundColor = '#ce1126';
-        document.getElementById('result-badge').innerText = (t("ui_wrong") || 'Ошибка. Ответ: ') + targetCity.name;
+        resultBadge.style.backgroundColor = '#ce1126';
+        resultBadge.innerText = t("uid_wrong") + " " + targetCity.name;
     }
 
     document.getElementById('context-city-name').innerText = targetCity.name;
     document.getElementById('context-history').innerText = targetCity.hist;
-    document.getElementById('context-symbolism').innerText = targetCity.motto; // Вывод девиза 
+    document.getElementById('context-symbolism').innerText = targetCity.motto;
 
     hideAllScreens();
     screens.context.classList.remove('hidden');
