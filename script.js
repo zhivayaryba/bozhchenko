@@ -176,7 +176,7 @@ async function initializeApp() {
         const parsedCidades = parseTSV(cidadesText);
         parsedCidades.forEach(row => {
         // Создаем объект флага с учетом coat_url
-        const flag = new FlagData(row.url, row.coord, row.coat_url); 
+        const flag = new FlagData(row.url, row.coord, row.coatUrl); 
         // Теперь передаем в конструктор города только cityId, stateId, nameKey, mottoKey, histKey и flag
         const city = new CidadeData(row.city, row.state, row.name, row.motto, row.hist, flag);
         quizData.cidadeData.push(city);
