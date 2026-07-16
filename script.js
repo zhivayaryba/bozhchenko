@@ -177,7 +177,8 @@ async function initializeApp() {
         const parsedCidades = parseTSV(cidadesText);
         parsedCidades.forEach(row => {
             const flag = new FlagData(row.url, row.coord); 
-            const city = new CidadeData(row.city, row.state, row.name, row.motto, row.hist, flag);
+            // ВАЖНО: добавили row.coat_url в конец! (Проверьте, чтобы столбец в таблице назывался coat_url)
+            const city = new CidadeData(row.city, row.state, row.name, row.motto, row.hist, flag, row.coat_url);
             quizData.cidadeData.push(city);
         });
 
@@ -281,17 +282,14 @@ function loadQuestion() {
 }
 
 function checkAnswer(selectedCityId, targetCity) {
-    activeTargetCity = targetCity; // <--- ДОБАВИТЬ ЭТО
+    activeTargetCity = targetCity; 
     const isCorrect = (selectedCityId === targetCity.city);
-    // ... остальной код функции
     
     // 1. ПОДСВЕТКА КНОПОК
     const options = document.querySelectorAll('#options-container button');
     options.forEach(btn => {
         btn.disabled = true; // Блокируем кнопки от двойного клика
         
-        // Чтобы это работало, при создании кнопок вариантов ответа нужно 
-        // присваивать им dataset: btn.dataset.id = optionCity.city;
         if (btn.dataset.id === targetCity.city) {
             btn.classList.add('correct'); // Всегда подсвечиваем правильный ответ зеленым
         } else if (btn.dataset.id === selectedCityId && !isCorrect) {
@@ -308,26 +306,21 @@ function checkAnswer(selectedCityId, targetCity) {
         document.getElementById('context-city-name').innerText = targetCity.name;
         document.getElementById('context-symbolism').innerText = targetCity.hist; 
         
-// Логика мотто (бронебойная проверка)
+        // --- БРОНЕБОЙНАЯ ЛОГИКА МОТТО ---
         const mottoCont = document.getElementById('motto-container');
-        const mottoKey = activeTargetCity.mottoKey; // Оригинальный ключ из таблицы
-        const translatedMotto = activeTargetCity.motto; // Попытка перевода
+        const mottoKey = activeTargetCity.mottoKey; 
+        const translatedMotto = activeTargetCity.motto; 
 
-        // 1. Очищаем от пробелов, табов и \r\n
         const cleanKey = mottoKey ? mottoKey.trim() : "";
         const cleanTranslation = translatedMotto ? translatedMotto.trim() : "";
 
-        // 2. Блокируем, если:
-        // - Ключ пустой
-        // - Ключ равен "N/A" (если вы так заполняли таблицу)
-        // - Перевод равен самому ключу (нет в словаре)
-        // - Перевод пустой
         if (!cleanKey || cleanKey.toUpperCase() === "N/A" || cleanTranslation === cleanKey || cleanTranslation === "") {
             mottoCont.style.display = 'none'; // Жестко прячем блок
         } else {
             mottoCont.style.display = 'block';
             document.getElementById('context-motto').innerText = cleanTranslation;
         }
+        // --------------------------------
 
         // Обновляем текст и цвет плашки на экране справки
         if (isCorrect) {
@@ -339,29 +332,24 @@ function checkAnswer(selectedCityId, targetCity) {
             resultBadge.className = "badge badge-wrong";
         }
 
+        // Показываем экран
+        hideAllScreens();
+        screens.context.classList.remove('hidden');
+
         // Инициализируем карту
         if (targetCity.coord) {
             setupMap(targetCity.coord);
         }
 
-        // 1. Показываем экран (убираем hidden)
-        hideAllScreens();
-        screens.context.classList.remove('hidden');
-
-        // 2. Инициализируем карту ПОСЛЕ того, как экран стал видимым
-        if (targetCity.coord) {
-            setupMap(targetCity.coord);
-        }
-
-        // 3. Даем браузеру 100мс на отрисовку интерфейса, затем принудительно обновляем карту и лупу
+        // Даем браузеру 100мс на отрисовку интерфейса, затем принудительно обновляем карту и лупу
         setTimeout(() => {
             if (mapInstance) {
-                mapInstance.invalidateSize(); // <-- Пересчитываем размеры карты
+                mapInstance.invalidateSize(); 
             }
             initLoupeEffect(targetCity.flagData.url, targetCity.coatUrl);
         }, 100);
 
-    }, 1000); // 1 секунда задержки для показа правильного/неправильного ответа
+    }, 1000); // 1 секунда задержки для показа ответа
 }
 
 function nextQuestion() {
