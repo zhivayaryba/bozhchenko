@@ -64,14 +64,17 @@ class StateData {
 }
 
 class CidadeData {
-    constructor(cityId, stateId, nameKey, mottoKey, histKey, flagData) {
+    constructor(cityId, stateId, nameKey, mottoKey, histKey, flagData, coatUrl) { // <-- добавили coatUrl
         this.city = cityId;
         this.state = stateId;
         this.nameKey = nameKey;
         this.mottoKey = mottoKey;
         this.histKey = histKey;
         this.flagData = flagData;
+        this.coatUrl = coatUrl; // <-- сохраняем
     }
+    // ... геттеры
+}
     get name() { return t(this.nameKey); }
     get motto() { return t(this.mottoKey); }
     get hist() { return t(this.histKey); }
@@ -245,9 +248,10 @@ function loadQuestion() {
     
     optionsObjects.forEach(cityObj => {
         const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.innerText = cityObj.name; 
-        btn.onclick = () => checkAnswer(cityObj.city, targetCity);
+        btn.innerText = cityObj.name; // БЫЛО: option.name
+        btn.className = 'option-btn'; 
+        btn.dataset.id = cityObj.city; // БЫЛО: option.city
+        btn.onclick = () => checkAnswer(cityObj.city, targetCity); // БЫЛО: currentTarget
         optionsContainer.appendChild(btn);
     });
 }
@@ -256,7 +260,7 @@ function checkAnswer(selectedCityId, targetCity) {
     const isCorrect = (selectedCityId === targetCity.city);
     
     // 1. ПОДСВЕТКА КНОПОК
-    const options = document.querySelectorAll('.options-grid button'); // или .option-btn в зависимости от вашего класса
+    const options = document.querySelectorAll('#options-container button');
     options.forEach(btn => {
         btn.disabled = true; // Блокируем кнопки от двойного клика
         
@@ -280,7 +284,7 @@ function checkAnswer(selectedCityId, targetCity) {
         
         // Логика мотто
         const mottoCont = document.getElementById('motto-container');
-        const translatedMotto = t(targetCity.motto);
+        const translatedMotto = targetCity.motto;
         
         if (translatedMotto && translatedMotto.trim() !== "") {
             mottoCont.style.display = 'block';
