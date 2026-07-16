@@ -373,6 +373,8 @@ let mapInstance = null; // Храним карту здесь
 
 // --- ФУНКЦИИ ЛУПЫ И КАРТЫ ---
 
+// --- ФУНКЦИИ ЛУПЫ И КАРТЫ ---
+
 function setupMap(coordString) {
     const match = coordString.match(/Point\(([^ ]+) ([^)]+)\)/);
     if (!match) return;
@@ -387,16 +389,14 @@ function setupMap(coordString) {
         }).addTo(mapInstance);
     }
     
-    // Ждем, пока браузер уберет класс hidden, и только потом рендерим карту
-    setTimeout(() => {
-        mapInstance.invalidateSize(); // Принудительно пересчитываем размер окна
-        mapInstance.setView([lat, lon], 11);
-        
-        mapInstance.eachLayer((layer) => {
-            if (layer instanceof L.Marker) { mapInstance.removeLayer(layer); }
-        });
-        L.marker([lat, lon]).addTo(mapInstance);
-    }, 200); // 200мс достаточно для завершения отрисовки CSS
+    // Обязательный пересчет размера для Leaflet после снятия display: none
+    mapInstance.invalidateSize(); 
+    mapInstance.setView([lat, lon], 11);
+    
+    mapInstance.eachLayer((layer) => {
+        if (layer instanceof L.Marker) { mapInstance.removeLayer(layer); }
+    });
+    L.marker([lat, lon]).addTo(mapInstance);
 }
 
 function initLoupeEffect(flagUrl, coatUrl) {
@@ -404,29 +404,33 @@ function initLoupeEffect(flagUrl, coatUrl) {
     const lens = document.getElementById('zoom-lens');
     const img = document.getElementById('context-flag-image');
 
-    // Устанавливаем герб как фон линзы
-    // Если герба нет, подставляем сам флаг, чтобы лупа просто увеличивала
-    const zoomImgUrl = coatUrl || flagUrl; 
-    lens.style.backgroundImage = `url('${zoomImgUrl}')`;
+    // Защита от пустых ячеек с пробелами из TSV
+    const cleanCoatUrl = (coatUrl && coatUrl.trim() !== "") ? coatUrl.trim() : flagUrl;
+    lens.style.backgroundImage = `url('${cleanCoatUrl}')`;
 
-    // Устанавливаем масштаб фона в линзе (например, 200% или 300% от размера линзы)
-    lens.style.backgroundSize = `${img.width * 1.5}px`; 
+    // ВАЖНО: Вычисляем размер лупы ТОЛЬКО когда картинка флага реально загрузилась
+    function applyLensSize() {
+        // Увеличиваем масштаб в 1.5 раза от текущего размера флага
+        lens.style.backgroundSize = `${img.clientWidth * 1.5}px`; 
+    }
+
+    if (img.complete) {
+        applyLensSize();
+    } else {
+        img.onload = applyLensSize;
+    }
 
     container.onmousemove = function(e) {
-        // Получаем позицию мыши внутри контейнера
         const rect = container.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // Двигаем линзу за курсором
         lens.style.left = x + 'px';
         lens.style.top = y + 'px';
 
-        // Двигаем фон ВНУТРИ линзы в противоположную сторону
-        // Чтобы казалось, что мы смотрим на фиксированную картинку
-        // Вычисляем процент положения курсора
-        const bgPosX = (x / img.width) * 100;
-        const bgPosY = (y / img.height) * 100;
+        // Двигаем фон ВНУТРИ линзы
+        const bgPosX = (x / img.clientWidth) * 100;
+        const bgPosY = (y / img.clientHeight) * 100;
         
         lens.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
     };
