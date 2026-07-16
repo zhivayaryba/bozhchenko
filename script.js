@@ -308,15 +308,25 @@ function checkAnswer(selectedCityId, targetCity) {
         document.getElementById('context-city-name').innerText = targetCity.name;
         document.getElementById('context-symbolism').innerText = targetCity.hist; 
         
-        // Логика мотто
+// Логика мотто (бронебойная проверка)
         const mottoCont = document.getElementById('motto-container');
-        const translatedMotto = targetCity.motto;
-        
-        if (translatedMotto && translatedMotto.trim() !== "") {
-            mottoCont.style.display = 'block';
-            document.getElementById('context-motto').innerText = translatedMotto;
+        const mottoKey = activeTargetCity.mottoKey; // Оригинальный ключ из таблицы
+        const translatedMotto = activeTargetCity.motto; // Попытка перевода
+
+        // 1. Очищаем от пробелов, табов и \r\n
+        const cleanKey = mottoKey ? mottoKey.trim() : "";
+        const cleanTranslation = translatedMotto ? translatedMotto.trim() : "";
+
+        // 2. Блокируем, если:
+        // - Ключ пустой
+        // - Ключ равен "N/A" (если вы так заполняли таблицу)
+        // - Перевод равен самому ключу (нет в словаре)
+        // - Перевод пустой
+        if (!cleanKey || cleanKey.toUpperCase() === "N/A" || cleanTranslation === cleanKey || cleanTranslation === "") {
+            mottoCont.style.display = 'none'; // Жестко прячем блок
         } else {
-            mottoCont.style.display = 'none';
+            mottoCont.style.display = 'block';
+            document.getElementById('context-motto').innerText = cleanTranslation;
         }
 
         // Обновляем текст и цвет плашки на экране справки
