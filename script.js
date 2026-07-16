@@ -308,17 +308,24 @@ function checkAnswer(selectedCityId, targetCity) {
             setupMap(targetCity.coord);
         }
 
-        // Показываем экран
+        // 1. Показываем экран (убираем hidden)
         hideAllScreens();
         screens.context.classList.remove('hidden');
 
-        // Инициализируем лупу (с задержкой для рендера)
+        // 2. Инициализируем карту ПОСЛЕ того, как экран стал видимым
+        if (targetCity.coord) {
+            setupMap(targetCity.coord);
+        }
+
+        // 3. Даем браузеру 100мс на отрисовку интерфейса, затем принудительно обновляем карту и лупу
         setTimeout(() => {
+            if (mapInstance) {
+                mapInstance.invalidateSize(); // <-- Пересчитываем размеры карты
+            }
             initLoupeEffect(targetCity.flagData.url, targetCity.coatUrl);
-            if (mapInstance) mapInstance.invalidateSize();
         }, 100);
 
-    }, 1000); // 1000 миллисекунд = 1 секунда задержки
+    }, 1000); // 1 секунда задержки для показа правильного/неправильного ответа
 }
 
 function nextQuestion() {
