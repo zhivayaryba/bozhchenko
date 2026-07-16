@@ -64,17 +64,16 @@ class StateData {
 }
 
 class CidadeData {
-    constructor(cityId, stateId, nameKey, mottoKey, histKey, flagData, coatUrl) { // <-- добавили coatUrl
+    constructor(cityId, stateId, nameKey, mottoKey, histKey, flagData, coatUrl) {
         this.city = cityId;
         this.state = stateId;
         this.nameKey = nameKey;
         this.mottoKey = mottoKey;
         this.histKey = histKey;
         this.flagData = flagData;
-        this.coatUrl = coatUrl; // <-- сохраняем
-    }
-    // ... геттеры
-}
+        this.coatUrl = coatUrl;
+    } // <--- ВОТ ЭТА СКОБКА ВЕРОЯТНО БЫЛА УДАЛЕНА!
+
     get name() { return t(this.nameKey); }
     get motto() { return t(this.mottoKey); }
     get hist() { return t(this.histKey); }
