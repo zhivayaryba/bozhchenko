@@ -237,3 +237,32 @@ button {
 .zoom-container:hover .lens {
     opacity: 1; /* Показываем при наведении */
 }
+
+/* Цвета кнопок при выборе ответа */
+.option-btn.correct {
+    background-color: #28a745 !important;
+    color: white !important;
+    border-color: #28a745 !important;
+}
+
+.option-btn.wrong {
+    background-color: #dc3545 !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+}
+
+/* Цвета плашки на экране справки */
+#result-badge {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.badge-correct {
+    color: #28a745;
+}
+
+.badge-wrong {
+    color: #dc3545;
+}
