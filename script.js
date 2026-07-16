@@ -304,3 +304,68 @@ function nextQuestion() {
 }
 
 initializeApp();
+
+// --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
+let mapInstance = null; // Храним карту здесь
+
+// --- ФУНКЦИИ ЛУПЫ И КАРТЫ ---
+
+function setupMap(coordString) {
+    // Викидата отдает координаты в формате "Point(-51.0227 -27.6108)" [Долгота Широта]
+    // Нам нужно достать эти цифры
+    const match = coordString.match(/Point\(([^ ]+) ([^)]+)\)/);
+    if (!match) return;
+
+    const lon = parseFloat(match[1]);
+    const lat = parseFloat(match[2]);
+
+    if (!mapInstance) {
+        // Создаем карту в первый раз
+        mapInstance = L.map('city-map');
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(mapInstance);
+    }
+    
+    // Переносим камеру на новый город (масштаб 11)
+    mapInstance.setView([lat, lon], 11);
+    
+    // Очищаем старые маркеры и ставим новый
+    mapInstance.eachLayer((layer) => {
+        if (layer instanceof L.Marker) { mapInstance.removeLayer(layer); }
+    });
+    L.marker([lat, lon]).addTo(mapInstance);
+}
+
+function initLoupeEffect(flagUrl, coatUrl) {
+    const container = document.getElementById('flag-zoom-container');
+    const lens = document.getElementById('zoom-lens');
+    const img = document.getElementById('context-flag-image');
+
+    // Устанавливаем герб как фон линзы
+    // Если герба нет, подставляем сам флаг, чтобы лупа просто увеличивала
+    const zoomImgUrl = coatUrl || flagUrl; 
+    lens.style.backgroundImage = `url('${zoomImgUrl}')`;
+
+    // Устанавливаем масштаб фона в линзе (например, 200% или 300% от размера линзы)
+    lens.style.backgroundSize = `${img.width * 1.5}px`; 
+
+    container.onmousemove = function(e) {
+        // Получаем позицию мыши внутри контейнера
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Двигаем линзу за курсором
+        lens.style.left = x + 'px';
+        lens.style.top = y + 'px';
+
+        // Двигаем фон ВНУТРИ линзы в противоположную сторону
+        // Чтобы казалось, что мы смотрим на фиксированную картинку
+        // Вычисляем процент положения курсора
+        const bgPosX = (x / img.width) * 100;
+        const bgPosY = (y / img.height) * 100;
+        
+        lens.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
+    };
+}
