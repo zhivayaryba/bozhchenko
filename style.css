@@ -148,16 +148,38 @@ button {
     color: #333;
 }
 
-.context-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: center;
-    margin-bottom: 20px;
+/* Делаем экран контекста гибким контейнером */
+#context-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Центрируем всё по горизонтали */
+    padding: 20px;
+}
+
+.context-wrapper {
+    display: flex;
+    flex-direction: row; /* Текст будет справа от флага */
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    width: 100%;
+    max-width: 900px;
+}
+
+.context-flag {
+    flex: 0 0 auto; /* Флаг не сжимается */
+    display: flex;
+    justify-content: center;
 }
 
 #context-flag-image {
-    max-width: 100%;
+    max-width: 300px; /* Фиксируем размер флага, чтобы он не менялся */
     height: auto;
     border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.context-info {
+    flex: 1; /* Текст занимает оставшееся место */
+    max-width: 400px;
 }
