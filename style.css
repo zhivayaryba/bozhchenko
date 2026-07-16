@@ -45,11 +45,11 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* Сетка кнопок с ответами */
+/* 2. Делаем кнопки в один столбик */
 .options-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    grid-template-columns: 1fr; /* БЫЛО: 1fr 1fr (два столбца). СТАЛО: 1fr (один) */
+    gap: 12px;
     margin-top: 20px;
 }
 
