@@ -45,31 +45,30 @@
             </div>
     </div>
 
-<!-- ЭКРАН 3: Исторический контекст -->
 <div id="context-screen" class="screen hidden">
     <div id="result-badge" class="badge"></div>
     <h2 id="context-city-name"></h2>
     
-    <!-- Сетка: Флаг слева, информация справа -->
-    <div class="context-grid">
+    <div class="context-wrapper">
+        <!-- Флаг слева -->
         <div class="context-flag">
             <img id="context-flag-image" src="" alt="Flag">
         </div>
         
+        <!-- Информация справа -->
         <div class="context-info">
             <div class="info-card">
-                <h3 data-i18n="uid_symbolism_title"></h3> <!-- Справка теперь Simbolism -->
+                <h3 data-i18n="uid_symbolism_title"></h3>
                 <p id="context-symbolism"></p>
             </div>
-
             <div class="info-card" id="motto-container">
-                <h3 data-i18n="uid_motto_title"></h3> <!-- Добавьте этот ключ в таблицу -->
+                <h3 data-i18n="uid_motto_title"></h3>
                 <p id="context-motto"></p>
             </div>
         </div>
     </div>
 
-    <button class="primary-btn" data-i18n="uid_continue_btn" onclick="nextQuestion()"></button>
+    <button class="primary-btn" data-i18n="uid_continue_btn" onclick="nextQuestion()" style="margin-top: 20px;"></button>
 </div>
 
     <div id="result-screen" class="screen hidden">
