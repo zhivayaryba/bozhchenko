@@ -35,11 +35,14 @@ window.changeLanguage = function(lang) {
     // ДОБАВЛЕННЫЙ БЛОК: Динамический перевод текста на экране контекста
     if (screens.context && !screens.context.classList.contains('hidden') && activeTargetCity) {
         document.getElementById('context-symbolism').innerText = activeTargetCity.hist;
-        
+
+        // Логика мотто
         const mottoCont = document.getElementById('motto-container');
-        const translatedMotto = activeTargetCity.motto; // Вызовет геттер с новым языком
+        const mottoKey = activeTargetCity.mottoKey; // Берем оригинальный ключ
+        const translatedMotto = activeTargetCity.motto; // Берем попытку перевода
         
-        if (translatedMotto && translatedMotto.trim() !== "") {
+        // Показываем только если: ключ есть И перевод не равен ключу И перевод не пустой
+        if (mottoKey && translatedMotto !== mottoKey && translatedMotto.trim() !== "") {
             mottoCont.style.display = 'block';
             document.getElementById('context-motto').innerText = translatedMotto;
         } else {
