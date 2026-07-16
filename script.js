@@ -266,6 +266,23 @@ function checkAnswer(selectedCityId, targetCity) {
     // 2. Логика для Мотто
     const mottoCont = document.getElementById('motto-container');
     const mottoText = targetCity.motto; // Получаем значение из таблицы
+
+// ... (начало функции checkAnswer, заполнение текстов)
+
+    // Запускаем карту, передавая строку координат из вашей таблицы (столбец coord)
+    if (targetCity.coord) {
+        setupMap(targetCity.coord);
+    }
+
+    // Запускаем лупу (нужно убедиться, что у вас в таблице есть колонка coatUrl для гербов)
+    // Таймер нужен, чтобы картинка успела отрендериться, и мы знали её размеры (img.width)
+    setTimeout(() => {
+        initLoupeEffect(targetCity.flagData.url, targetCity.coatUrl);
+        // Если Leaflet прятался (был hidden), ему нужно обновить размеры при показе
+        if (mapInstance) mapInstance.invalidateSize();
+    }, 100);
+
+// ... (показ экрана контекста)
     
     // Проверяем: если t(mottoText) вернуло пустоту или сам текст пуст
     const translatedMotto = t(mottoText);
