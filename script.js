@@ -336,20 +336,15 @@ function checkAnswer(selectedCityId, targetCity) {
         hideAllScreens();
         screens.context.classList.remove('hidden');
 
-        // Инициализируем карту
-        if (targetCity.coord) {
-            setupMap(targetCity.coord);
-        }
-
-        // Даем браузеру 100мс на отрисовку интерфейса, затем принудительно обновляем карту и лупу
+        // Даем браузеру 150мс на то, чтобы отрисовать CSS, и только потом рендерим карту и лупу
         setTimeout(() => {
-            if (mapInstance) {
-                mapInstance.invalidateSize(); 
+            if (targetCity.coord) {
+                setupMap(targetCity.coord);
             }
             initLoupeEffect(targetCity.flagData.url, targetCity.coatUrl);
-        }, 100);
+        }, 150);
 
-    }, 1000); // 1 секунда задержки для показа ответа
+    }, 1000); // 1 секунда задержки
 }
 
 function nextQuestion() {
