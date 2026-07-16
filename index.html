@@ -45,18 +45,30 @@
             </div>
     </div>
 
+<!-- ЭКРАН 3: Исторический контекст -->
 <div id="context-screen" class="screen hidden">
     <div id="result-badge" class="badge"></div>
-    <h2 id="context-city-name"></h2>
+    <h2 id="context-city-name" style="text-align: center; width: 100%; margin-bottom: 20px;"></h2>
     
-    <div class="context-wrapper">
-        <!-- Флаг слева -->
-        <div class="context-flag">
-            <img id="context-flag-image" src="" alt="Flag">
+    <!-- ТРИ КОЛОНКИ -->
+    <div class="context-grid-3col">
+        
+        <!-- ЛЕВАЯ: Карта -->
+        <div class="panel-left">
+            <div id="city-map"></div>
         </div>
         
-        <!-- Информация справа -->
-        <div class="context-info">
+        <!-- ЦЕНТР: Флаг с эффектом лупы -->
+        <div class="panel-center">
+            <div class="zoom-container" id="flag-zoom-container">
+                <img id="context-flag-image" src="" alt="Flag">
+                <!-- Это сама "линза" лупы -->
+                <div id="zoom-lens" class="lens hidden"></div>
+            </div>
+        </div>
+        
+        <!-- ПРАВАЯ: Текст -->
+        <div class="panel-right">
             <div class="info-card">
                 <h3 data-i18n="uid_symbolism_title"></h3>
                 <p id="context-symbolism"></p>
@@ -66,13 +78,18 @@
                 <p id="context-motto"></p>
             </div>
         </div>
+
     </div>
 
-    <button class="primary-btn" data-i18n="uid_continue_btn" onclick="nextQuestion()" style="margin-top: 20px;"></button>
+    <div style="text-align: center; width: 100%; margin-top: 20px;">
+        <button class="primary-btn" data-i18n="uid_continue_btn" onclick="nextQuestion()"></button>
+    </div>
 </div>
-
     <div id="result-screen" class="screen hidden">
         <h2 data-i18n="uid_finish_title"></h2>
         <p>
             <span data-i18n="uid_result_text_1"></span> 
             <span id="score-display"
+    <!-- Подключаем стили и скрипты для карты OpenStreetMap -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
