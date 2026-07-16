@@ -254,56 +254,67 @@ function loadQuestion() {
 
 function checkAnswer(selectedCityId, targetCity) {
     const isCorrect = (selectedCityId === targetCity.city);
-    const resultBadge = document.getElementById('result-badge');
     
-    // Заполняем основные данные
-    document.getElementById('context-flag-image').src = targetCity.flagData.url;
-    document.getElementById('context-city-name').innerText = targetCity.name;
-    
-    // 1. Устанавливаем Символизм (ранее History)
-    document.getElementById('context-symbolism').innerText = targetCity.hist; 
-    
-    // 2. Логика для Мотто
-    const mottoCont = document.getElementById('motto-container');
-    const mottoText = targetCity.motto; // Получаем значение из таблицы
+    // 1. ПОДСВЕТКА КНОПОК
+    const options = document.querySelectorAll('.options-grid button'); // или .option-btn в зависимости от вашего класса
+    options.forEach(btn => {
+        btn.disabled = true; // Блокируем кнопки от двойного клика
+        
+        // Чтобы это работало, при создании кнопок вариантов ответа нужно 
+        // присваивать им dataset: btn.dataset.id = optionCity.city;
+        if (btn.dataset.id === targetCity.city) {
+            btn.classList.add('correct'); // Всегда подсвечиваем правильный ответ зеленым
+        } else if (btn.dataset.id === selectedCityId && !isCorrect) {
+            btn.classList.add('wrong'); // Если игрок выбрал этот ответ и он неверный - красным
+        }
+    });
 
-// ... (начало функции checkAnswer, заполнение текстов)
-
-    // Запускаем карту, передавая строку координат из вашей таблицы (столбец coord)
-    if (targetCity.coord) {
-        setupMap(targetCity.coord);
-    }
-
-    // Запускаем лупу (нужно убедиться, что у вас в таблице есть колонка coatUrl для гербов)
-    // Таймер нужен, чтобы картинка успела отрендериться, и мы знали её размеры (img.width)
+    // 2. ЖДЕМ 1 СЕКУНДУ И ПЕРЕХОДИМ НА ЭКРАН СПРАВКИ
     setTimeout(() => {
-        initLoupeEffect(targetCity.flagData.url, targetCity.coatUrl);
-        // Если Leaflet прятался (был hidden), ему нужно обновить размеры при показе
-        if (mapInstance) mapInstance.invalidateSize();
-    }, 100);
+        const resultBadge = document.getElementById('result-badge');
+        
+        // Заполняем данные контекста
+        document.getElementById('context-flag-image').src = targetCity.flagData.url;
+        document.getElementById('context-city-name').innerText = targetCity.name;
+        document.getElementById('context-symbolism').innerText = targetCity.hist; 
+        
+        // Логика мотто
+        const mottoCont = document.getElementById('motto-container');
+        const translatedMotto = t(targetCity.motto);
+        
+        if (translatedMotto && translatedMotto.trim() !== "") {
+            mottoCont.style.display = 'block';
+            document.getElementById('context-motto').innerText = translatedMotto;
+        } else {
+            mottoCont.style.display = 'none';
+        }
 
-// ... (показ экрана контекста)
-    
-    // Проверяем: если t(mottoText) вернуло пустоту или сам текст пуст
-    const translatedMotto = t(mottoText);
-    
-    if (translatedMotto && translatedMotto.trim() !== "") {
-        mottoCont.style.display = 'block';
-        document.getElementById('context-motto').innerText = translatedMotto;
-    } else {
-        mottoCont.style.display = 'none';
-    }
+        // Обновляем текст и цвет плашки на экране справки
+        if (isCorrect) {
+            score++;
+            resultBadge.innerText = t("uid_correct");
+            resultBadge.className = "badge badge-correct";
+        } else {
+            resultBadge.innerText = t("uid_wrong") + " " + targetCity.name;
+            resultBadge.className = "badge badge-wrong";
+        }
 
-    // Обработка правильности
-    if (isCorrect) {
-        score++;
-        resultBadge.innerText = t("uid_correct");
-    } else {
-        resultBadge.innerText = t("uid_wrong") + " " + targetCity.name;
-    }
+        // Инициализируем карту
+        if (targetCity.coord) {
+            setupMap(targetCity.coord);
+        }
 
-    hideAllScreens();
-    screens.context.classList.remove('hidden');
+        // Показываем экран
+        hideAllScreens();
+        screens.context.classList.remove('hidden');
+
+        // Инициализируем лупу (с задержкой для рендера)
+        setTimeout(() => {
+            initLoupeEffect(targetCity.flagData.url, targetCity.coatUrl);
+            if (mapInstance) mapInstance.invalidateSize();
+        }, 100);
+
+    }, 1000); // 1000 миллисекунд = 1 секунда задержки
 }
 
 function nextQuestion() {
