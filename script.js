@@ -349,8 +349,6 @@ let mapInstance = null; // Храним карту здесь
 // --- ФУНКЦИИ ЛУПЫ И КАРТЫ ---
 
 function setupMap(coordString) {
-    // Викидата отдает координаты в формате "Point(-51.0227 -27.6108)" [Долгота Широта]
-    // Нам нужно достать эти цифры
     const match = coordString.match(/Point\(([^ ]+) ([^)]+)\)/);
     if (!match) return;
 
@@ -358,21 +356,22 @@ function setupMap(coordString) {
     const lat = parseFloat(match[2]);
 
     if (!mapInstance) {
-        // Создаем карту в первый раз
         mapInstance = L.map('city-map');
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(mapInstance);
     }
     
-    // Переносим камеру на новый город (масштаб 11)
-    mapInstance.setView([lat, lon], 11);
-    
-    // Очищаем старые маркеры и ставим новый
-    mapInstance.eachLayer((layer) => {
-        if (layer instanceof L.Marker) { mapInstance.removeLayer(layer); }
-    });
-    L.marker([lat, lon]).addTo(mapInstance);
+    // Ждем, пока браузер уберет класс hidden, и только потом рендерим карту
+    setTimeout(() => {
+        mapInstance.invalidateSize(); // Принудительно пересчитываем размер окна
+        mapInstance.setView([lat, lon], 11);
+        
+        mapInstance.eachLayer((layer) => {
+            if (layer instanceof L.Marker) { mapInstance.removeLayer(layer); }
+        });
+        L.marker([lat, lon]).addTo(mapInstance);
+    }, 200); // 200мс достаточно для завершения отрисовки CSS
 }
 
 function initLoupeEffect(flagUrl, coatUrl) {
