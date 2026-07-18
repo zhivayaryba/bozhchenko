@@ -425,11 +425,8 @@ function initStartScreen() {
     const minZoom = 2;   
     const maxZoom = 20; 
 
-// 1. ФУНКЦИЯ ОБНОВЛЕНИЯ ФОНА ЛУПЫ
     function refreshLensBackground() {
         let svgData = new XMLSerializer().serializeToString(svg);
-        
-        // Вшиваем стили прямо внутрь SVG, чтобы лупа знала, как рисовать свечение
         const injectedStyles = `
             <style>
                 .active-hitbox {
@@ -439,15 +436,11 @@ function initStartScreen() {
                 }
             </style>
         `;
-        
-        // Вставляем стили сразу после открывающего тега <svg ...>
         svgData = svgData.replace(/^(<svg[^>]*>)/i, '$1' + injectedStyles);
-
         const encodedData = encodeURIComponent(svgData);
         lens.style.backgroundImage = `url('data:image/svg+xml;utf8,${encodedData}')`;
     }
 
-    // 2. Обновление масштаба зума
     function setZoom(delta) {
         zoomFactor = Math.max(minZoom, Math.min(maxZoom, zoomFactor + delta));
         if (container.clientWidth > 0) {
@@ -455,12 +448,10 @@ function initStartScreen() {
         }
     }
     
-    // Инициализация лупы
     refreshLensBackground();
     setTimeout(() => setZoom(0), 100);
     window.addEventListener('resize', () => setZoom(0));
 
-    // 3. Вывод текста локализации (ищем ближайший hitbox)
     function updateText(element) {
         const hitbox = element.closest('.hitbox');
         if (hitbox && hitbox.id) {
@@ -468,56 +459,43 @@ function initStartScreen() {
         }
     }
 
-    // 4. Позиционирование лупы
     function updateLoupePosition(clientX, clientY) {
         const rect = container.getBoundingClientRect();
         const x = clientX - rect.left;
         const y = clientY - rect.top;
 
-        // Двигаем линзу за курсором/пальцем
         lens.style.left = (x - lens.offsetWidth / 2) + 'px';
         lens.style.top = (y - lens.offsetHeight / 2) + 'px';
 
-        // Двигаем фон внутри линзы для эффекта приближения
         const bgPosX = (lens.offsetWidth / 2) - (x * zoomFactor);
         const bgPosY = (lens.offsetHeight / 2) - (y * zoomFactor);
         lens.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
     }
 
-    // --- ФУНКЦИИ ПОДСВЕТКИ (С СИНХРОНИЗАЦИЕЙ ЛУПЫ) ---
     function clearHighlight() {
         if (currentHighlighted) {
             currentHighlighted.classList.remove('active-hitbox');
             currentHighlighted = null;
-            refreshLensBackground(); // Синхронизируем выключение
+            refreshLensBackground();
         }
     }
 
     function setHighlight(element) {
         const hitbox = element.closest('.hitbox');
-        
-        // Если мы всё ещё над тем же объектом — ничего не делаем
         if (hitbox === currentHighlighted) return;
-        
-        // Очищаем старый хайлайт
         clearHighlight();
-
-        // Если нашли новый объект — подсвечиваем
         if (hitbox) {
             currentHighlighted = hitbox;
             currentHighlighted.classList.add('active-hitbox');
-            refreshLensBackground(); // Синхронизируем включение
+            refreshLensBackground(); 
         }
     }
     
-    // ==========================================
-    // ЛОГИКА ДЛЯ ПК (Мышь)
-    // ==========================================
+    // --- ЛОГИКА ДЛЯ ПК ---
     container.addEventListener('mousemove', (e) => {
         updateLoupePosition(e.clientX, e.clientY);
         lens.style.opacity = '0';
         
-        // Текст меняется только при зажатой ЛКМ
         if (e.buttons === 1) {
             lens.style.opacity = '1'; 
             updateText(e.target);
@@ -532,19 +510,27 @@ function initStartScreen() {
 
     container.addEventListener('mouseleave', () => {
         lens.style.opacity = '0';
+        clearHighlight();
     });
     
-    // Изменение зума колесиком
+    // СНИЖЕННАЯ ЧУВСТВИТЕЛЬНОСТЬ КОЛЕСИКА (шаг 0.2 вместо 0.5)
     container.addEventListener('wheel', (e) => {
         e.preventDefault();
-        const delta = e.deltaY < 0 ? 0.5 : -0.5;
+        const delta = e.deltaY < 0 ? 0.2 : -0.2;
         setZoom(delta);
         updateLoupePosition(e.clientX, e.clientY);
     });
 
-    // ==========================================
-    // ЛОГИКА ДЛЯ МОБИЛЬНЫХ (Touch)
-    // ==========================================
+    // --- НОВОЕ: СБРОС ПРИ КЛИКЕ ВНЕ ФЛАГА ---
+    document.addEventListener('mousedown', (e) => {
+        // Если клик был не внутри контейнера с флагом
+        if (!container.contains(e.target)) {
+            clearHighlight();
+            infoText.innerText = ""; // Очищаем текст
+        }
+    });
+
+    // --- ЛОГИКА ДЛЯ МОБИЛЬНЫХ ---
     let initialPinchDistance = null;
 
     function getDistance(touches) {
@@ -573,7 +559,8 @@ function initStartScreen() {
         } else if (e.touches.length === 2) {
             const currentDistance = getDistance(e.touches);
             if (initialPinchDistance) {
-                const delta = (currentDistance - initialPinchDistance) * 0.02;
+                // Снижена чувствительность зума двумя пальцами
+                const delta = (currentDistance - initialPinchDistance) * 0.01;
                 setZoom(delta);
                 initialPinchDistance = currentDistance;
             }
