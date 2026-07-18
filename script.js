@@ -412,8 +412,6 @@ function initLoupeEffect(flagUrl, coatUrl, containerId, lensId, imgId) {
 
 // --- ЛОГИКА СТАРТОВОГО ЭКРАНА ---
 
-// --- ЛОГИКА СТАРТОВОГО ЭКРАНА ---
-
 function initStartScreen() {
     const container = document.getElementById('start-zoom-container');
     const svg = document.getElementById('start-svg-flag');
@@ -492,12 +490,11 @@ function initStartScreen() {
     container.addEventListener('mousemove', (e) => {
         lens.style.opacity = '1'; 
         updateLoupePosition(e.clientX, e.clientY);
-
-        setHighlight(e.target);
         
         // Текст меняется только при зажатой ЛКМ
         if (e.buttons === 1) {
             updateText(e.target);
+            setHighlight(e.target);
         }
     });
 
