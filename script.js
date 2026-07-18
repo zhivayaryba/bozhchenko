@@ -626,7 +626,7 @@ function initStartScreen() {
     if (topMap) {
         // Функция для синхронной подсветки карты и флага
         const highlightStateAndFlag = (target) => {
-            const id = target.id;
+            const id = target.id.toLowerCase().trim();
             if (id && id.length === 2 && currentHighlightedId !== id) {
                 clearHighlight();
                 currentHighlightedId = id;
@@ -637,36 +637,45 @@ function initStartScreen() {
                     flagEl.classList.add('active-hitbox');
                 }
     
-                // 2. Подсвечиваем штат на верхней карте
-                const mapEl = document.querySelector(`#brazil-map #${id}`);
-                if (mapEl) {
-                    mapEl.classList.add('active-map-state');
-                }
+                // 2. Подсвечиваем штат на верхней карте (добавляем класс прямо на лету)
+                target.classList.add('active-map-state');
     
                 refreshLensBackground();
             }
         };
 
+        // Вспомогательная функция для поиска штата по клику/ховеру
+        const getStateTarget = (element) => {
+            // Ищем ближайший элемент (или сам элемент), у которого есть атрибут id
+            const targetWithId = element.closest('[id]');
+            // Если нашли и его id состоит ровно из 2 букв — это наш штат
+            if (targetWithId && targetWithId.id.trim().length === 2) {
+                return targetWithId;
+            }
+            return null;
+        };
+
         // 1. Сканирование только при ЗАЖАТОЙ левой кнопке мыши
         topMap.addEventListener('mousemove', (e) => {
             if (e.buttons === 1) { // Проверяем зажатие ЛКМ
-                const target = e.target.closest('.map-state');
+                const target = getStateTarget(e.target);
+                
                 if (target) {
                     highlightStateAndFlag(target);
                     updateText(target);
                 } else {
-                    // Если ведем зажатой мышкой по океану - сбрасываем карточку
+                    // Если ведем зажатой мышкой по океану или фону - сбрасываем карточку
                     clearHighlight();
-                    currentHighlightedId = null; // Обязательно сбрасываем ID
+                    currentHighlightedId = null;
                     if (infoText) infoText.innerText = ""; 
                     if (infoFlag) infoFlag.style.visibility = 'hidden'; 
                 }
             }
         });
     
-        // 2. Отрабатываем момент самого первого клика (чтобы карточка появлялась сразу)
+        // 2. Отрабатываем момент самого первого клика
         topMap.addEventListener('mousedown', (e) => {
-            const target = e.target.closest('.map-state');
+            const target = getStateTarget(e.target);
             if (target) {
                 highlightStateAndFlag(target);
                 updateText(target);
@@ -683,15 +692,13 @@ function initStartScreen() {
     
         // 4. Обычный клик (нажал-отпустил) по штату для старта викторины
         topMap.addEventListener('click', (e) => {
-            const target = e.target.closest('.map-state');
-            if (target && target.id) {
+            const target = getStateTarget(e.target);
+            if (target) {
                 const stateId = target.id.toLowerCase().trim();
-                if (stateId.length === 2) {
-                    clearHighlight();
-                    currentHighlightedId = null;
-                    if (lens) lens.style.opacity = '0'; // Прячем лупу флага на всякий случай
-                    startCityQuiz(stateId); 
-                }
+                clearHighlight();
+                currentHighlightedId = null;
+                if (lens) lens.style.opacity = '0'; 
+                startCityQuiz(stateId); 
             }
         });
     }
