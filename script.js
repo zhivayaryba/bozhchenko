@@ -411,64 +411,58 @@ function initLoupeEffect(flagUrl, coatUrl, containerId, lensId, imgId) {
 }
 
 // --- ЛОГИКА СТАРТОВОГО ЭКРАНА ---
-const startScreenDict = {
-    "rectangular": "Зеленый фон: символизирует густые леса Бразилии.",
-    "romb": "Желтый ромб: символизирует золото и богатство недр.",
-    "circle": "Синий круг: звездное небо над Рио-де-Жанейро 15 ноября 1889 года.",
-    "bend": "Белая лента",
-    "letters": "Девиз 'Ordem e Progresso' (Порядок и Прогресс).",
-    "sp": "Звезда Альфа Южного Креста (Акрукс): символизирует штат Сан-Паулу.",
-    "rj": "Звезда Бета Южного Креста (Мимоза): штат Рио-де-Жанейро.",
-    "ba": "Звезда Гамма Южного Креста (Гакрукс): штат Баия.",
-    "mg": "Звезда Дельта Южного Креста (Палида): штат Минас-Жерайс.",
-    "es": "Звезда Эпсилон Южного Креста: штат Эспириту-Санту.",
-    "sc": "Звезда Бета Южного Треугольника: штат Санта-Катарина.",
-    "rs": "Звезда Альфа Южного Треугольника: штат Риу-Гранди-ду-Сул.",
-    "pr": "Звезда Гамма Южного Треугольника: штат Парана.",
-    "go": "Звезда Канопус: штат Гояс.",
-    "mt": "Звезда Сириус: штат Мату-Гросу.",
-    "ms": "Звезда Альфард: штат Мату-Гросу-ду-Сул.",
-    "ac": "Звезда Гамма Гидры: штат Акри.",
-    "ro": "Звезда Ротанев: штат Рондония.",
-    "rr": "Звезда Суалокин: штат Рорайма.",
-    "to": "Звезда Канопус: штат Токантинс.",
-    "pa": "Звезда Спика: штат Пара (единственная звезда над лентой).",
-    "ap": "Звезда Акрукс 2: штат Амапа.",
-    "ma": "Звезда Граффиас (Скорпион): штат Мараньян.",
-    "pi": "Звезда Антарес (Скорпион): штат Пиауи.",
-    "ce": "Звезда Акамар (Скорпион): штат Сеара.",
-    "rn": "Звезда Саргас (Скорпион): штат Риу-Гранди-ду-Норти.",
-    "pb": "Звезда Вей (Скорпион): штат Параиба.",
-    "pe": "Звезда Шаула (Скорпион): штат Пернамбуку.",
-    "al": "Звезда Альниат (Скорпион): штат Алагоас.",
-    "se": "Звезда Альхена: штат Сержипи.",
-    "df": "Звезда Сигма Октанта (Полярная звезда Юга): Федеральный округ (Бразилиа)."
-};
 
 function initStartScreen() {
     const hitboxes = document.querySelectorAll('#start-svg-flag .hitbox');
     const infoText = document.getElementById('start-info-text');
-    const defaultText = "Наведите лупу на элементы флага";
+    
+    // Флаг того, что пользователь зафиксировал текст кликом
+    let isLocked = false; 
 
     hitboxes.forEach(box => {
-        box.addEventListener('mouseenter', (e) => {
-            e.stopPropagation(); 
-            const objectId = e.target.id || e.target.closest('g').id; 
+        // 1. При нажатии (mousedown) — обновляем текст и блокируем его
+        box.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+            isLocked = true;
             
+            const objectId = e.target.id || e.target.closest('.hitbox').id;
             if (objectId) {
-                infoText.innerText = startScreenDict[objectId] || `Объект: ${objectId.toUpperCase()}`;
+                // Прямой вызов локализации по ID объекта
+                infoText.innerText = t(objectId); 
             }
         });
-        
+
+        // 2. При наведении (если еще не зафиксировано) — показываем динамически
+        box.addEventListener('mouseenter', (e) => {
+            if (!isLocked) {
+                const objectId = e.target.id || e.target.closest('.hitbox').id;
+                if (objectId) {
+                    infoText.innerText = t(objectId);
+                }
+            }
+        });
+
+        // 3. При уходе мыши (если не зафиксировано) — сбрасываем
         box.addEventListener('mouseleave', () => {
-            infoText.innerText = defaultText;
+            if (!isLocked) {
+                infoText.innerText = t("uid_start_instruction");
+            }
         });
     });
 
-    initInlineSVGLoupe('start-zoom-container', 'start-lens', 'start-svg-flag');
+    // Сброс фиксации при клике на пустое место (на фон или сам контейнер)
+    document.getElementById('start-zoom-container').addEventListener('mousedown', (e) => {
+        if (e.target.id === 'start-zoom-container') {
+            isLocked = false;
+            infoText.innerText = t("uid_start_instruction");
+        }
+    });
+
+    // Инициализация лупы (передаем функцию проверки нажатия)
+    initInlineSVGLoupe('start-zoom-container', 'start-lens', 'start-svg-flag', () => true);
 }
 
-function initInlineSVGLoupe(containerId, lensId, svgId) {
+function initInlineSVGLoupe(containerId, lensId, svgId, checkHolding) {
     const container = document.getElementById(containerId);
     const lens = document.getElementById(lensId);
     const svg = document.getElementById(svgId);
@@ -502,6 +496,10 @@ function initInlineSVGLoupe(containerId, lensId, svgId) {
         
         lens.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
     };
+    
+    // Лупа видна только при наведении на контейнер
+    container.addEventListener('mouseenter', () => lens.style.opacity = "1");
+    container.addEventListener('mouseleave', () => lens.style.opacity = "0");
 }
 
 initializeApp();
