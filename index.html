@@ -19,13 +19,6 @@
 
 <div class="app-container">
     <div id="start-screen" class="screen">
-
-        <!-- Контейнер для вывода информации -->
-        <div id="info-container" class="info-card">
-            <p id="start-info-text"></p>
-            <!-- Изображение флага (по умолчанию скрыто) -->
-            <img id="start-info-flag" src="" alt="Bandeira do Estado" style="display: none;">
-        </div>
         
         <!-- БЛОК 1: Фиксированный контейнер для флага и лупы -->
         <div id="start-flag-zone">
@@ -371,11 +364,11 @@
             </div>
         </div>
     
-        <!-- БЛОК 2: Фиксированный контейнер для текста и кнопки -->
-        <div id="start-info-zone">
-            <!-- Убрали хардкод, добавили data-i18n -->
-            <h2 id="start-info-text" data-i18n="uid_start_instruction"></h2>
-            <button id="start-btn" class="primary-btn" data-i18n="uid_start_btn" onclick="startGame()"></button>
+        <!-- Контейнер для вывода информации -->
+        <div id="info-container" class="info-card">
+            <p id="start-info-text"></p>
+            <!-- Изображение флага (по умолчанию скрыто) -->
+            <img id="start-info-flag" src="" alt="Bandeira do Estado" style="display: none;">
         </div>
     </div>
 
