@@ -413,55 +413,102 @@ function initLoupeEffect(flagUrl, coatUrl, containerId, lensId, imgId) {
 // --- ЛОГИКА СТАРТОВОГО ЭКРАНА ---
 
 function initStartScreen() {
-    const hitboxes = document.querySelectorAll('#start-svg-flag .hitbox');
+    const container = document.getElementById('start-zoom-container');
+    const svg = document.getElementById('start-svg-flag');
+    const lens = document.getElementById('start-lens');
     const infoText = document.getElementById('start-info-text');
+
+    // Если элементов нет на странице — прерываем выполнение
+    if (!container || !svg || !lens || !infoText) return;
+
+    let isHolding = false;
+    let zoomFactor = 2; // Масштаб увеличения (2 = 200%)
+
+    // 1. Конвертируем сам код SVG в картинку для фона лупы
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const encodedData = encodeURIComponent(svgData);
+    lens.style.backgroundImage = `url('data:image/svg+xml;utf8,${encodedData}')`;
+
+    // 2. Функция применения точного размера фона
+    function applyLensSize() {
+        if (container.clientWidth > 0) {
+            lens.style.backgroundSize = `${container.clientWidth * zoomFactor}px ${container.clientHeight * zoomFactor}px`;
+        }
+    }
     
-    // Флаг того, что пользователь зафиксировал текст кликом
-    let isLocked = false; 
+    // Ждем полной отрисовки и применяем масштаб
+    setTimeout(applyLensSize, 100);
+    window.addEventListener('resize', applyLensSize);
 
-    hitboxes.forEach(box => {
-        // 1. При нажатии (mousedown) — обновляем текст и блокируем его
-        box.addEventListener('mousedown', (e) => {
-            e.stopPropagation();
-            isLocked = true;
-            
-            const objectId = e.target.id || e.target.closest('.hitbox').id;
-            if (objectId) {
-                // Прямой вызов локализации по ID объекта
-                infoText.innerText = t(objectId); 
-            }
-        });
+    // 3. Функция вывода текста из словаря
+    function updateText(element) {
+        // Ищем ID у самого элемента или его родителя
+        const objectId = element.id || element.closest('.hitbox')?.id;
+        if (objectId) {
+            infoText.innerText = t(objectId); // Берем перевод по ID
+        }
+    }
 
-        // 2. При наведении (если еще не зафиксировано) — показываем динамически
-        box.addEventListener('mouseenter', (e) => {
-            if (!isLocked) {
-                const objectId = e.target.id || e.target.closest('.hitbox').id;
-                if (objectId) {
-                    infoText.innerText = t(objectId);
-                }
-            }
-        });
-
-        // 3. При уходе мыши (если не зафиксировано) — сбрасываем
-        box.addEventListener('mouseleave', () => {
-            if (!isLocked) {
-                infoText.innerText = t("uid_start_instruction");
-            }
-        });
+    // 4. ЛОГИКА УДЕРЖАНИЯ КЛИКА (Hold to reveal)
+    
+    // Нажали кнопку
+    container.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // Защита от выделения картинки/текста браузером при перетаскивании
+        isHolding = true;
+        lens.style.opacity = '1';
+        
+        updateLoupePosition(e);
+        updateText(e.target);
     });
 
-    // Сброс фиксации при клике на пустое место (на фон или сам контейнер)
-    document.getElementById('start-zoom-container').addEventListener('mousedown', (e) => {
-        if (e.target.id === 'start-zoom-container') {
-            isLocked = false;
-            infoText.innerText = t("uid_start_instruction");
+    // Отпустили кнопку (слушаем весь документ, чтобы сработало даже если курсор ушел за флаг)
+    document.addEventListener('mouseup', () => {
+        isHolding = false;
+        lens.style.opacity = '0';
+        // Текст НЕ сбрасываем, он остается
+    });
+
+    // Двигаем зажатой мышью
+    container.addEventListener('mousemove', (e) => {
+        if (isHolding) {
+            e.preventDefault();
+            updateLoupePosition(e);
+            updateText(e.target);
         }
     });
 
-    // Инициализация лупы (передаем функцию проверки нажатия)
-    initInlineSVGLoupe('start-zoom-container', 'start-lens', 'start-svg-flag', () => true);
-}
+    // Защита: если курсор ушел с флага - прячем лупу
+    container.addEventListener('mouseleave', () => {
+        lens.style.opacity = '0';
+    });
 
+    // Защита: если курсор вернулся на флаг и кнопка все еще зажата - показываем
+    container.addEventListener('mouseenter', (e) => {
+        if (isHolding && e.buttons === 1) { // 1 = левая кнопка мыши
+            lens.style.opacity = '1';
+        } else {
+            isHolding = false;
+        }
+    });
+
+    // 5. ИСПРАВЛЕННАЯ ФУНКЦИЯ ДВИЖЕНИЯ ЛУПЫ
+    function updateLoupePosition(e) {
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Идеальное центрирование самой линзы относительно кончика курсора
+        lens.style.left = (x - lens.offsetWidth / 2) + 'px';
+        lens.style.top = (y - lens.offsetHeight / 2) + 'px';
+
+        // Идеальное позиционирование фона лупы (решает проблему кривого отражения).
+        // Считаем по абсолютным пикселям: половина ширины лупы минус координаты мыши с учетом зума
+        const bgPosX = (lens.offsetWidth / 2) - (x * zoomFactor);
+        const bgPosY = (lens.offsetHeight / 2) - (y * zoomFactor);
+        
+        lens.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+    }
+}
 function initInlineSVGLoupe(containerId, lensId, svgId, checkHolding) {
     const container = document.getElementById(containerId);
     const lens = document.getElementById(lensId);
