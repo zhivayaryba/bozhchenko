@@ -532,22 +532,60 @@ function initStartScreen() {
         lens.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
     }
 
+    let currentHighlightedId = null; // Запоминаем ID, а не сам элемент
+
     function clearHighlight() {
-        if (currentHighlighted) {
-            currentHighlighted.classList.remove('active-hitbox');
-            currentHighlighted = null;
+        if (currentHighlightedId) {
+            // Ищем элемент на флаге и снимаем свечение
+            const flagEl = document.querySelector(`#start-svg-flag #${currentHighlightedId}`);
+            if (flagEl) flagEl.classList.remove('active-hitbox');
+
+            // Ищем элемент на верхней карте и убираем красный цвет
+            const mapEl = document.querySelector(`#brazil-map #${currentHighlightedId}`);
+            if (mapEl) mapEl.classList.remove('active-map-state');
+
+            currentHighlightedId = null;
             refreshLensBackground();
         }
     }
 
     function setHighlight(element) {
-        const hitbox = element.closest('.hitbox');
-        if (hitbox === currentHighlighted) return;
-        clearHighlight();
-        if (hitbox) {
-            currentHighlighted = hitbox;
-            currentHighlighted.classList.add('active-hitbox');
-            refreshLensBackground(); 
+        // Мы можем навестить либо на звезду (.hitbox), либо на штат карты (.map-state)
+        const target = element.closest('.hitbox, .map-state');
+        if (!target || !target.id) return;
+
+        const id = target.id.toLowerCase().trim();
+        
+        // Если это обычный символ (не штат), и мы навели на флаг
+        if (id.length !== 2 && target.classList.contains('hitbox')) {
+            if (currentHighlightedId !== id) {
+                clearHighlight();
+                currentHighlightedId = id;
+                target.classList.add('active-hitbox');
+                refreshLensBackground();
+            }
+            return;
+        }
+
+        // Если это штат (ID состоит из 2 букв)
+        if (id.length === 2 && currentHighlightedId !== id) {
+            clearHighlight();
+            currentHighlightedId = id;
+
+            // 1. Подсвечиваем звезду на флаге
+            const flagEl = document.querySelector(`#start-svg-flag #${id}`);
+            if (flagEl) {
+                // Если мы навели на карту, нам нужно имитировать обновление лупы для флага
+                flagEl.classList.add('active-hitbox');
+            }
+
+            // 2. Подсвечиваем штат на верхней карте (красным)
+            const mapEl = document.querySelector(`#brazil-map #${id}`);
+            if (mapEl) {
+                mapEl.classList.add('active-map-state');
+            }
+
+            refreshLensBackground();
         }
     }
     
@@ -579,6 +617,43 @@ function initStartScreen() {
     container.addEventListener('mouseleave', () => {
         lens.style.opacity = '0';
     });
+
+    // ==========================================
+    // ЛОГИКА ДЛЯ ВЕРХНЕЙ КАРТЫ
+    // ==========================================
+    const topMap = document.getElementById('brazil-map');
+    
+    if (topMap) {
+        topMap.addEventListener('mousemove', (e) => {
+            const target = e.target.closest('.map-state');
+            if (target) {
+                setHighlight(target);
+                updateText(target);
+            } else {
+                clearHighlight();
+                if (infoText) infoText.innerText = ""; 
+                if (infoFlag) infoFlag.style.visibility = 'hidden'; 
+            }
+        });
+
+        topMap.addEventListener('mouseleave', () => {
+            clearHighlight();
+            if (infoText) infoText.innerText = ""; 
+            if (infoFlag) infoFlag.style.visibility = 'hidden'; 
+        });
+
+        topMap.addEventListener('click', (e) => {
+            const target = e.target.closest('.map-state');
+            if (target && target.id) {
+                const stateId = target.id.toLowerCase().trim();
+                if (stateId.length === 2) {
+                    clearHighlight();
+                    lens.style.opacity = '0';
+                    startCityQuiz(stateId); // Переход к квизу по клику на карту
+                }
+            }
+        });
+    }
     
     // СНИЖЕННАЯ ЧУВСТВИТЕЛЬНОСТЬ КОЛЕСИКА (шаг 0.2 вместо 0.5)
     container.addEventListener('wheel', (e) => {
