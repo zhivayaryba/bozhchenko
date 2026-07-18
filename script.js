@@ -342,7 +342,7 @@ function checkAnswer(selectedCityId, targetCity) {
         // Даем браузеру 150мс на то, чтобы отрисовать CSS, и только потом рендерим карту и лупу
         setTimeout(() => {
             if (targetCity.coord) {
-                setupMap(targetCity.coord);
+                setupMap(targetCity.flagData.coord);
             }
             // Запускаем лупу для экрана справки (ОБНОВЛЕННЫЙ ВЫЗОВ)
             initLoupeEffect(targetCity.flagData.url, targetCity.flagData.coatUrl, 'flag-zoom-container', 'zoom-lens', 'context-flag-image');
