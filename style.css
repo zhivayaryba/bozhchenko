@@ -96,7 +96,7 @@ body {
 
 /* Зоны клика (Hitboxes) */
 .hitbox {
-    cursor: none; 
+    cursor: crosshair; /* Пусть всегда остается прицелом при наведении */
 }
 
 #start-svg-flag .hitbox g path,
