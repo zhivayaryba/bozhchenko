@@ -498,7 +498,7 @@ function initStartScreen() {
             setHighlight(e.target);
         }
     });
-
+    
     container.addEventListener('mouseup', (e) => {
         updateText(e.target);
         lens.style.opacity = '0';
@@ -506,6 +506,7 @@ function initStartScreen() {
 
     container.addEventListener('mouseleave', () => {
         lens.style.opacity = '0';
+        clearHighlight();
     });
     
     // Изменение зума колесиком
@@ -592,10 +593,6 @@ function initInlineSVGLoupe(containerId, lensId, svgId, checkHolding) {
         
         lens.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
     };
-    
-    // Лупа видна только при наведении на контейнер
-    container.addEventListener('mouseenter', () => lens.style.opacity = "1");
-    container.addEventListener('mouseleave', () => lens.style.opacity = "0");
 }
 
 initializeApp();
