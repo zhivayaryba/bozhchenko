@@ -420,14 +420,12 @@ function initStartScreen() {
 
     if (!container || !svg || !lens || !infoText) return;
 
-    let zoomFactor = 4; // МАСШТАБ (чем больше цифра, тем "ближе" лупа. Попробуйте 3, 4 или 5)
+    let zoomFactor = 8; // Увеличено приближение и чувствительность (было 4)
 
-    // 1. Конвертируем код SVG в картинку для фона лупы
     const svgData = new XMLSerializer().serializeToString(svg);
     const encodedData = encodeURIComponent(svgData);
     lens.style.backgroundImage = `url('data:image/svg+xml;utf8,${encodedData}')`;
 
-    // 2. Применяем размер фона
     function applyLensSize() {
         if (container.clientWidth > 0) {
             lens.style.backgroundSize = `${container.clientWidth * zoomFactor}px ${container.clientHeight * zoomFactor}px`;
@@ -437,55 +435,44 @@ function initStartScreen() {
     setTimeout(applyLensSize, 100);
     window.addEventListener('resize', applyLensSize);
 
-    // 3. Функция вывода текста (ищет класс hitbox)
     function updateText(element) {
         const hitbox = element.closest('.hitbox');
         if (hitbox && hitbox.id) {
             infoText.innerText = t(hitbox.id);
         }
     }
-
-    // 4. ЛОГИКА ЛУПЫ И НАЖАТИЙ
     
-    // Двигаем мышь: Лупа работает ВСЕГДА
     container.addEventListener('mousemove', (e) => {
         e.preventDefault();
-        lens.style.opacity = '1'; // Показываем лупу
+        lens.style.opacity = '1'; 
         updateLoupePosition(e);
         
-        // Если левая кнопка мыши ЗАЖАТА (сканирование) - обновляем текст на ходу
         if (e.buttons === 1) {
             updateText(e.target);
         }
     });
 
-    // Кликаем (нажимаем): Обновляем текст
     container.addEventListener('mousedown', (e) => {
         e.preventDefault();
         updateText(e.target);
     });
 
-    // Убираем мышь за пределы флага: прячем лупу
     container.addEventListener('mouseleave', () => {
         lens.style.opacity = '0';
     });
 
-    // Возвращаем мышь: сразу показываем лупу
     container.addEventListener('mouseenter', () => {
         lens.style.opacity = '1';
     });
 
-    // 5. ИДЕАЛЬНОЕ ЦЕНТРИРОВАНИЕ ЛУПЫ И ФОНА
     function updateLoupePosition(e) {
         const rect = container.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // Ставим линзу ровно центром на курсор мыши
         lens.style.left = (x - lens.offsetWidth / 2) + 'px';
         lens.style.top = (y - lens.offsetHeight / 2) + 'px';
 
-        // Сдвигаем фон с учетом масштаба, чтобы центр картинки совпал с крестиком прицела
         const bgPosX = (lens.offsetWidth / 2) - (x * zoomFactor);
         const bgPosY = (lens.offsetHeight / 2) - (y * zoomFactor);
         
