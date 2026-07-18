@@ -276,3 +276,63 @@ button {
 .badge-wrong {
     color: #dc3545;
 }
+
+Да, чтобы этот HTML «ожил», нам нужно добавить логику в JavaScript (чтобы лупа читала SVG и выводился текст) и пару строк в CSS (чтобы зафиксировать размеры).
+
+Вот точные куски кода, которые нужно добавить или обновить в ваших файлах.
+
+1. В файл style.css
+Добавьте этот блок, чтобы жестко зафиксировать экран и убрать стандартный курсор над интерактивными зонами:
+
+CSS
+/* Фиксация контейнера на стартовом экране */
+#start-flag-zone {
+    width: 100%;
+    height: 350px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#start-zoom-container {
+    width: 100%;
+    max-width: 500px; 
+    height: 100%;
+    position: relative;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Растягиваем SVG на весь контейнер */
+#start-svg-flag {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+}
+
+/* Прячем обычную мышку над интерактивными зонами флага */
+.hitbox {
+    cursor: none; 
+}
+
+/* Фиксация зоны текста */
+#start-info-zone {
+    width: 100%;
+    height: 120px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#start-info-text {
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-align: center;
+    min-height: 50px; /* Чтобы текст в две строки не прыгал */
+    color: #333;
+}
