@@ -505,14 +505,20 @@ function initStartScreen() {
         }
     });
 
-    // --- СБРОС ПРИ КЛИКЕ ВНЕ ФЛАГА ---
+// --- СБРОС ПРИ КЛИКЕ ВНЕ ФЛАГА И ВНЕ ФЛАГА-КНОПКИ ---
     document.addEventListener('mousedown', (e) => {
-        if (!container.contains(e.target)) {
+        // Проверяем: кликнули ли мы по самому контейнеру флага ИЛИ по самому флагу-кнопке
+        const isClickOnContainer = container.contains(e.target);
+        const isClickOnFlagButton = (e.target === infoFlag);
+        
+        // Если клик мимо всего этого - сбрасываем
+        if (!isClickOnContainer && !isClickOnFlagButton) {
             clearHighlight();
             if (infoText) infoText.innerText = ""; 
             if (infoFlag) infoFlag.style.visibility = 'hidden'; 
         }
     });
+    
     function updateLoupePosition(clientX, clientY) {
         const rect = container.getBoundingClientRect();
         const x = clientX - rect.left;
