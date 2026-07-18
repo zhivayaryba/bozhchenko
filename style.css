@@ -110,8 +110,8 @@ button {
     border-radius: 8px;
     padding: 20px;
     margin: 20px auto 0 auto; /* Центрируем сам контейнер по горизонтали */
-    min-height: 200px; /* Резервируем высоту для текста и флага */
-    max-width: 550px; /* Делаем контейнер аккуратным и узким */
+    min-height: 400px; /* Резервируем высоту для текста и флага */
+    max-width: 500px; /* Делаем контейнер аккуратным и узким */
     display: flex;
     flex-direction: column;
     align-items: center;
