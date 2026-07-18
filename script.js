@@ -458,28 +458,26 @@ function initStartScreen() {
     // Получаем элементы нашего нового контейнера
     const infoFlag = document.getElementById('start-info-flag');
 
+    // 3. Вывод текста локализации и флага
     function updateText(element) {
         const hitbox = element.closest('.hitbox');
         
         if (hitbox && hitbox.id) {
-            // ИСПРАВЛЕНИЕ 3: Добавили .trim(), чтобы убрать пробелы (например, "mg " станет "mg")
             const id = hitbox.id.toLowerCase().trim();
             
             if (id.length === 2) {
                 infoText.innerText = t("uid_state_" + id);
-                
-                // Здесь тоже добавили .trim() для надежности
                 const stateObj = quizData.stateData.find(s => s.state.toLowerCase().trim() === id);
                 
                 if (stateObj && stateObj.flagData && stateObj.flagData.url) {
                     infoFlag.src = stateObj.flagData.url;
-                    infoFlag.style.display = 'block'; 
+                    infoFlag.style.visibility = 'visible'; // Показываем флаг (место уже есть)
                 } else {
-                    infoFlag.style.display = 'none';
+                    infoFlag.style.visibility = 'hidden'; // Скрываем, оставляя пустое место
                 }
             } else {
                 infoText.innerText = t(id);
-                if (infoFlag) infoFlag.style.display = 'none';
+                if (infoFlag) infoFlag.style.visibility = 'hidden'; 
             }
         }
     }
@@ -488,11 +486,10 @@ function initStartScreen() {
     document.addEventListener('mousedown', (e) => {
         if (!container.contains(e.target)) {
             clearHighlight();
-            if (infoText) infoText.innerText = "";
-            if (infoFlag) infoFlag.style.display = 'none';
+            if (infoText) infoText.innerText = ""; 
+            if (infoFlag) infoFlag.style.visibility = 'hidden'; 
         }
     });
-
     function updateLoupePosition(clientX, clientY) {
         const rect = container.getBoundingClientRect();
         const x = clientX - rect.left;
