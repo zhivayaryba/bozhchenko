@@ -510,7 +510,6 @@ function initStartScreen() {
 
     container.addEventListener('mouseleave', () => {
         lens.style.opacity = '0';
-        clearHighlight();
     });
     
     // СНИЖЕННАЯ ЧУВСТВИТЕЛЬНОСТЬ КОЛЕСИКА (шаг 0.2 вместо 0.5)
