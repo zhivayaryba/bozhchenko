@@ -442,10 +442,10 @@ function initStartScreen() {
 
     // 3. Функция вывода текста из словаря
     function updateText(element) {
-        // Ищем ID у самого элемента или его родителя
-        const objectId = element.id || element.closest('.hitbox')?.id;
-        if (objectId) {
-            infoText.innerText = t(objectId); // Берем перевод по ID
+        // Жестко заставляем скрипт искать родителя с классом hitbox, игнорируя внутренние ID контуров
+        const hitbox = element.closest('.hitbox');
+        if (hitbox && hitbox.id) {
+            infoText.innerText = t(hitbox.id);
         }
     }
 
