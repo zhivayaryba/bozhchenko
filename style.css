@@ -285,10 +285,8 @@ button {
 Добавьте этот блок, чтобы жестко зафиксировать экран и убрать стандартный курсор над интерактивными зонами:
 
 CSS
-/* Фиксация контейнера на стартовом экране */
 #start-flag-zone {
     width: 100%;
-    height: 350px; 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -298,20 +296,16 @@ CSS
 #start-zoom-container {
     width: 100%;
     max-width: 500px; 
-    height: 100%;
-    position: relative;
+    position: relative; /* Обязательно для лупы */
     border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: transparent;
 }
 
-/* Растягиваем SVG на весь контейнер */
 #start-svg-flag {
     width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 5;
+    height: auto; /* SVG сам задает высоту пропорционально ширине */
+    display: block;
+    /* Мы убрали position: absolute, теперь флаг физически занимает место */
 }
 
 /* Прячем обычную мышку над интерактивными зонами флага */
