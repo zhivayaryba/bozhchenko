@@ -624,38 +624,63 @@ function initStartScreen() {
     const topMap = document.getElementById('brazil-map');
     
     if (topMap) {
+        // Функция для синхронной подсветки карты и флага
+        const highlightStateAndFlag = (target) => {
+            const id = target.id;
+            if (id && id.length === 2 && currentHighlightedId !== id) {
+                clearHighlight();
+                currentHighlightedId = id;
+    
+                // 1. Подсвечиваем звезду на флаге
+                const flagEl = document.querySelector(`#start-svg-flag #${id}`);
+                if (flagEl) {
+                    flagEl.classList.add('active-hitbox');
+                }
+    
+                // 2. Подсвечиваем штат на верхней карте
+                const mapEl = document.querySelector(`#brazil-map #${id}`);
+                if (mapEl) {
+                    mapEl.classList.add('active-map-state');
+                }
+    
+                refreshLensBackground();
+            }
+        };
+
         // 1. Сканирование только при ЗАЖАТОЙ левой кнопке мыши
         topMap.addEventListener('mousemove', (e) => {
             if (e.buttons === 1) { // Проверяем зажатие ЛКМ
                 const target = e.target.closest('.map-state');
                 if (target) {
-                    setHighlight(target);
+                    highlightStateAndFlag(target);
                     updateText(target);
                 } else {
                     // Если ведем зажатой мышкой по океану - сбрасываем карточку
                     clearHighlight();
+                    currentHighlightedId = null; // Обязательно сбрасываем ID
                     if (infoText) infoText.innerText = ""; 
                     if (infoFlag) infoFlag.style.visibility = 'hidden'; 
                 }
             }
         });
-
+    
         // 2. Отрабатываем момент самого первого клика (чтобы карточка появлялась сразу)
         topMap.addEventListener('mousedown', (e) => {
             const target = e.target.closest('.map-state');
             if (target) {
-                setHighlight(target);
+                highlightStateAndFlag(target);
                 updateText(target);
             }
         });
-
+    
         // 3. Убираем мышь с карты — сбрасываем всё
         topMap.addEventListener('mouseleave', () => {
             clearHighlight();
+            currentHighlightedId = null;
             if (infoText) infoText.innerText = ""; 
             if (infoFlag) infoFlag.style.visibility = 'hidden'; 
         });
-
+    
         // 4. Обычный клик (нажал-отпустил) по штату для старта викторины
         topMap.addEventListener('click', (e) => {
             const target = e.target.closest('.map-state');
@@ -663,6 +688,7 @@ function initStartScreen() {
                 const stateId = target.id.toLowerCase().trim();
                 if (stateId.length === 2) {
                     clearHighlight();
+                    currentHighlightedId = null;
                     if (lens) lens.style.opacity = '0'; // Прячем лупу флага на всякий случай
                     startCityQuiz(stateId); 
                 }
