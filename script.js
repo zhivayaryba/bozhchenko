@@ -459,36 +459,35 @@ function initStartScreen() {
     const infoFlag = document.getElementById('start-info-flag');
 
     // 3. Вывод текста локализации и флага
-    function updateText(element) {
-        const hitbox = element.closest('.hitbox');
+    function updateText(element, forcedId = null) {
+    // Если передан forcedId, используем его, иначе ищем через .hitbox
+    const id = forcedId || (element.closest('.hitbox') ? element.closest('.hitbox').id : element.id);
+    
+    if (id) {
+        const cleanId = id.toLowerCase().trim();
         
-        if (hitbox && hitbox.id) {
-            const id = hitbox.id.toLowerCase().trim();
+        if (cleanId.length === 2) {
+            infoText.innerText = t("uid_state_" + cleanId);
             
-            if (id.length === 2) {
-                infoText.innerText = t("uid_state_" + id);
-                
-                const stateObj = quizData.stateData.find(s => s.state.toLowerCase().trim() === id);
-                
-                if (stateObj && stateObj.flagData && stateObj.flagData.url) {
-                    infoFlag.src = stateObj.flagData.url;
-                    infoFlag.style.visibility = 'visible'; 
-                    
-                    // НОВОЕ: Сохраняем ID штата в атрибут data-target-state
-                    infoFlag.dataset.targetState = stateObj.state; 
-                } else {
-                    infoFlag.style.visibility = 'hidden';
-                    infoFlag.dataset.targetState = ""; // Очищаем, если флага нет
-                }
+            const stateObj = quizData.stateData.find(s => s.state.toLowerCase().trim() === cleanId);
+            
+            if (stateObj && stateObj.flagData && stateObj.flagData.url) {
+                infoFlag.src = stateObj.flagData.url;
+                infoFlag.style.visibility = 'visible'; 
+                infoFlag.dataset.targetState = stateObj.state; 
             } else {
-                infoText.innerText = t(id);
-                if (infoFlag) {
-                    infoFlag.style.visibility = 'hidden';
-                    infoFlag.dataset.targetState = "";
-                }
+                infoFlag.style.visibility = 'hidden';
+                infoFlag.dataset.targetState = ""; 
+            }
+        } else {
+            infoText.innerText = t(cleanId);
+            if (infoFlag) {
+                infoFlag.style.visibility = 'hidden';
+                infoFlag.dataset.targetState = "";
             }
         }
     }
+}
 
     // --- НОВОЕ: ОБРАБОТЧИК КЛИКА ПО ФЛАГУ ---
     infoFlag.addEventListener('click', () => {
