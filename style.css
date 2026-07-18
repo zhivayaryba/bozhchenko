@@ -98,13 +98,39 @@ button {
     background: #004080;
 }
 
-/* Историческая карточка */
+* Оформление карточки информации */
 .info-card {
-    background: #f8f9fa;
-    padding: 15px;
+    background-color: #fcfcfc;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+/* Шрифт Garamond для текста */
+#start-info-text {
+    font-family: 'Garamond', 'EB Garamond', 'Times New Roman', serif;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: #2c3e50;
+    margin: 0;
+}
+
+/* Флаг штата внутри контейнера */
+#start-info-flag {
+    width: 60px; /* Аккуратный размер миниатюры */
+    height: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     margin-top: 15px;
-    text-align: left;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .badge {
