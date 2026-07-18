@@ -422,116 +422,90 @@ function initStartScreen() {
 
     if (!container || !svg || !lens || !infoText) return;
 
-    let zoomFactor = 8; // Приближение лупы
+    let zoomFactor = 8; // Начальный зум
+    const minZoom = 2;   
+    const maxZoom = 20; 
 
-    // ДИНАМИЧЕСКИЙ РАЗМЕР ЛУПЫ
-    let currentLensSize = 150; 
-    const minLensSize = 60;  // Минимальный диаметр лупы
-    const maxLensSize = 350; // Максимальный диаметр лупы
-
+    // 1. Подготовка линзы
     const svgData = new XMLSerializer().serializeToString(svg);
     const encodedData = encodeURIComponent(svgData);
     lens.style.backgroundImage = `url('data:image/svg+xml;utf8,${encodedData}')`;
 
-    // Применяем размер фона
-    function applyLensSize() {
+    // 2. Обновление масштаба зума
+    function setZoom(delta) {
+        zoomFactor = Math.max(minZoom, Math.min(maxZoom, zoomFactor + delta));
         if (container.clientWidth > 0) {
             lens.style.backgroundSize = `${container.clientWidth * zoomFactor}px ${container.clientHeight * zoomFactor}px`;
         }
     }
     
-    setTimeout(applyLensSize, 100);
-    window.addEventListener('resize', applyLensSize);
+    // Применяем начальный зум
+    setTimeout(() => setZoom(0), 100);
+    window.addEventListener('resize', () => setZoom(0));
 
-    // Установка размера лупы
-    function setLensSize(size) {
-        currentLensSize = Math.max(minLensSize, Math.min(maxLensSize, size));
-        lens.style.width = currentLensSize + 'px';
-        lens.style.height = currentLensSize + 'px';
-    }
-    setLensSize(currentLensSize); // Инициализация
-
-    // Функция вывода текста (ищет класс hitbox)
+    // 3. Вывод текста локализации (ищем ближайший hitbox)
     function updateText(element) {
-        if (!element) return;
         const hitbox = element.closest('.hitbox');
         if (hitbox && hitbox.id) {
             infoText.innerText = t(hitbox.id);
         }
     }
 
-    // ИДЕАЛЬНОЕ ЦЕНТРИРОВАНИЕ ЛУПЫ
+    // 4. Позиционирование лупы
     function updateLoupePosition(clientX, clientY) {
         const rect = container.getBoundingClientRect();
         const x = clientX - rect.left;
         const y = clientY - rect.top;
 
-        lens.style.left = (x - currentLensSize / 2) + 'px';
-        lens.style.top = (y - currentLensSize / 2) + 'px';
+        // Двигаем линзу за курсором/пальцем
+        lens.style.left = (x - lens.offsetWidth / 2) + 'px';
+        lens.style.top = (y - lens.offsetHeight / 2) + 'px';
 
-        const bgPosX = (currentLensSize / 2) - (x * zoomFactor);
-        const bgPosY = (currentLensSize / 2) - (y * zoomFactor);
-        
+        // Двигаем фон внутри линзы для эффекта приближения
+        const bgPosX = (lens.offsetWidth / 2) - (x * zoomFactor);
+        const bgPosY = (lens.offsetHeight / 2) - (y * zoomFactor);
         lens.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
     }
 
     // ==========================================
     // ЛОГИКА ДЛЯ ПК (Мышь)
     // ==========================================
-
     container.addEventListener('mousemove', (e) => {
-        e.preventDefault();
         lens.style.opacity = '1'; 
         updateLoupePosition(e.clientX, e.clientY);
         
-        if (e.buttons === 1) { // Если зажата ЛКМ
+        // Текст меняется только при зажатой ЛКМ
+        if (e.buttons === 1) {
             updateText(e.target);
         }
     });
 
     container.addEventListener('mousedown', (e) => {
-        e.preventDefault();
         updateText(e.target);
     });
 
-    container.addEventListener('mouseleave', () => lens.style.opacity = '0');
-    container.addEventListener('mouseenter', () => lens.style.opacity = '1');
-
-    // 1. КОЛЕСИКО МЫШИ ДЛЯ ИЗМЕНЕНИЯ РАЗМЕРА ЛУПЫ
+    // Изменение зума колесиком
     container.addEventListener('wheel', (e) => {
-        e.preventDefault(); // Отключаем прокрутку страницы
-        const delta = e.deltaY < 0 ? 15 : -15; // Крутим вверх = больше, вниз = меньше
-        setLensSize(currentLensSize + delta);
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.5 : -0.5;
+        setZoom(delta);
         updateLoupePosition(e.clientX, e.clientY);
     });
 
     // ==========================================
-    // ЛОГИКА ДЛЯ ТЕЛЕФОНА (Сенсорный экран)
+    // ЛОГИКА ДЛЯ МОБИЛЬНЫХ (Touch)
     // ==========================================
-
     let initialPinchDistance = null;
 
-    // Высчитываем расстояние между двумя пальцами (для пинч-зума)
     function getDistance(touches) {
         const dx = touches[0].clientX - touches[1].clientX;
         const dy = touches[0].clientY - touches[1].clientY;
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    // Мобильная логика ведения (считываем элемент из-под пальца)
-    function handleTouchMove(touch) {
-        updateLoupePosition(touch.clientX, touch.clientY);
-        // Лупа имеет pointer-events: none, поэтому мы пробиваем ее насквозь
-        const elementUnderFinger = document.elementFromPoint(touch.clientX, touch.clientY);
-        updateText(elementUnderFinger);
-    }
-
     container.addEventListener('touchstart', (e) => {
-        e.preventDefault(); 
-        if (e.touches.length === 1) {
-            lens.style.opacity = '1';
-            handleTouchMove(e.touches[0]);
-        } else if (e.touches.length === 2) {
+        lens.style.opacity = '1';
+        if (e.touches.length === 2) {
             initialPinchDistance = getDistance(e.touches);
         }
     });
@@ -539,35 +513,24 @@ function initStartScreen() {
     container.addEventListener('touchmove', (e) => {
         e.preventDefault();
         if (e.touches.length === 1) {
-            handleTouchMove(e.touches[0]); // Водим 1 пальцем - читаем текст и двигаем
+            const touch = e.touches[0];
+            updateLoupePosition(touch.clientX, touch.clientY);
+            const el = document.elementFromPoint(touch.clientX, touch.clientY);
+            updateText(el);
         } else if (e.touches.length === 2) {
-            // Водим 2 пальцами - меняем размер лупы
             const currentDistance = getDistance(e.touches);
             if (initialPinchDistance) {
-                const delta = currentDistance - initialPinchDistance;
-                setLensSize(currentLensSize + delta * 0.8); // 0.8 - множитель чувствительности
-                initialPinchDistance = currentDistance; 
-                
-                // Центрируем лупу между пальцами
-                const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                updateLoupePosition(midX, midY);
+                const delta = (currentDistance - initialPinchDistance) * 0.02;
+                setZoom(delta);
+                initialPinchDistance = currentDistance;
             }
         }
-    });
+    }, { passive: false });
 
-    container.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        if (e.touches.length === 0) {
-            lens.style.opacity = '0'; // Убрали все пальцы - прячем лупу
-            initialPinchDistance = null;
-        }
-    });
+    container.addEventListener('touchend', () => lens.style.opacity = '0');
 
-    container.addEventListener('touchcancel', () => {
-        lens.style.opacity = '0';
-        initialPinchDistance = null;
-    });
+    // Уход мыши
+    container.addEventListener('mouseleave', () => lens.style.opacity = '0');
 }
 
 function initInlineSVGLoupe(containerId, lensId, svgId, checkHolding) {
