@@ -425,10 +425,24 @@ function initStartScreen() {
     const minZoom = 2;   
     const maxZoom = 20; 
 
-    // 1. ФУНКЦИЯ ОБНОВЛЕНИЯ ФОНА ЛУПЫ
-    // Перезаписывает фон лупы, чтобы в ней отображались самые свежие изменения (например, подсветка)
+// 1. ФУНКЦИЯ ОБНОВЛЕНИЯ ФОНА ЛУПЫ
     function refreshLensBackground() {
-        const svgData = new XMLSerializer().serializeToString(svg);
+        let svgData = new XMLSerializer().serializeToString(svg);
+        
+        // Вшиваем стили прямо внутрь SVG, чтобы лупа знала, как рисовать свечение
+        const injectedStyles = `
+            <style>
+                .active-hitbox {
+                    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1)) brightness(1.5);
+                    stroke: white !important;
+                    stroke-width: 2px;
+                }
+            </style>
+        `;
+        
+        // Вставляем стили сразу после открывающего тега <svg ...>
+        svgData = svgData.replace(/^(<svg[^>]*>)/i, '$1' + injectedStyles);
+
         const encodedData = encodeURIComponent(svgData);
         lens.style.backgroundImage = `url('data:image/svg+xml;utf8,${encodedData}')`;
     }
