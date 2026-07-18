@@ -425,14 +425,17 @@ function initStartScreen() {
     const minZoom = 2;   
     const maxZoom = 20; 
 
+    // Задаем базовый курсор для контейнера
+    container.style.cursor = 'crosshair';
+
     function refreshLensBackground() {
         let svgData = new XMLSerializer().serializeToString(svg);
         const injectedStyles = `
             <style>
                 .active-hitbox {
+                    /* ИСПРАВЛЕНИЕ 2: Убрали stroke: white и stroke-width.
+                       Теперь звезды не будут пузатыми, останется только свечение */
                     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1)) brightness(1.5);
-                    stroke: white !important;
-                    stroke-width: 2px;
                 }
             </style>
         `;
@@ -452,45 +455,41 @@ function initStartScreen() {
     setTimeout(() => setZoom(0), 100);
     window.addEventListener('resize', () => setZoom(0));
 
-// Получаем элементы нашего нового контейнера
+    // Получаем элементы нашего нового контейнера
     const infoFlag = document.getElementById('start-info-flag');
 
-    // 3. Вывод текста локализации и флага
     function updateText(element) {
         const hitbox = element.closest('.hitbox');
         
         if (hitbox && hitbox.id) {
-            const id = hitbox.id.toLowerCase();
+            // ИСПРАВЛЕНИЕ 3: Добавили .trim(), чтобы убрать пробелы (например, "mg " станет "mg")
+            const id = hitbox.id.toLowerCase().trim();
             
-            // Если ID состоит ровно из 2 букв (это штат, например, 'sc', 'rj')
             if (id.length === 2) {
-                // Выводим текст локализации, склеив "uid_state_" + id
                 infoText.innerText = t("uid_state_" + id);
                 
-                // Ищем данные штата в массиве, который мы скачали из Google Sheets
-                const stateObj = quizData.stateData.find(s => s.state.toLowerCase() === id);
+                // Здесь тоже добавили .trim() для надежности
+                const stateObj = quizData.stateData.find(s => s.state.toLowerCase().trim() === id);
                 
                 if (stateObj && stateObj.flagData && stateObj.flagData.url) {
                     infoFlag.src = stateObj.flagData.url;
-                    infoFlag.style.display = 'block'; // Показываем флаг
+                    infoFlag.style.display = 'block'; 
                 } else {
                     infoFlag.style.display = 'none';
                 }
             } else {
-                // Если это обычный символ (например, uid_symbol_romb)
                 infoText.innerText = t(id);
-                if (infoFlag) infoFlag.style.display = 'none'; // Скрываем флаг
+                if (infoFlag) infoFlag.style.display = 'none';
             }
         }
     }
 
     // --- СБРОС ПРИ КЛИКЕ ВНЕ ФЛАГА ---
     document.addEventListener('mousedown', (e) => {
-        // Если клик был не внутри контейнера с флагом
         if (!container.contains(e.target)) {
             clearHighlight();
-            if (infoText) infoText.innerText = ""; // Очищаем текст
-            if (infoFlag) infoFlag.style.display = 'none'; // Прячем флаг
+            if (infoText) infoText.innerText = "";
+            if (infoFlag) infoFlag.style.display = 'none';
         }
     });
 
@@ -529,22 +528,27 @@ function initStartScreen() {
     // --- ЛОГИКА ДЛЯ ПК ---
     container.addEventListener('mousemove', (e) => {
         updateLoupePosition(e.clientX, e.clientY);
-        lens.style.opacity = '0';
         
         if (e.buttons === 1) {
             lens.style.opacity = '1'; 
+            container.style.cursor = 'none'; // ИСПРАВЛЕНИЕ 1: Скрываем курсор, когда лупа активна
             updateText(e.target);
             setHighlight(e.target);
+        } else {
+            lens.style.opacity = '0';
+            container.style.cursor = 'crosshair'; // ИСПРАВЛЕНИЕ 1: Показываем курсор, когда просто ведем
         }
     });
     
     container.addEventListener('mouseup', (e) => {
         updateText(e.target);
         lens.style.opacity = '0';
+        container.style.cursor = 'crosshair'; // Возвращаем курсор при отпускании
     });
 
     container.addEventListener('mouseleave', () => {
         lens.style.opacity = '0';
+        container.style.cursor = 'default';
     });
     
     // СНИЖЕННАЯ ЧУВСТВИТЕЛЬНОСТЬ КОЛЕСИКА (шаг 0.2 вместо 0.5)
@@ -553,15 +557,6 @@ function initStartScreen() {
         const delta = e.deltaY < 0 ? 0.2 : -0.2;
         setZoom(delta);
         updateLoupePosition(e.clientX, e.clientY);
-    });
-
-    // --- НОВОЕ: СБРОС ПРИ КЛИКЕ ВНЕ ФЛАГА ---
-    document.addEventListener('mousedown', (e) => {
-        // Если клик был не внутри контейнера с флагом
-        if (!container.contains(e.target)) {
-            clearHighlight();
-            infoText.innerText = ""; // Очищаем текст
-        }
     });
 
     // --- ЛОГИКА ДЛЯ МОБИЛЬНЫХ ---
@@ -593,7 +588,6 @@ function initStartScreen() {
         } else if (e.touches.length === 2) {
             const currentDistance = getDistance(e.touches);
             if (initialPinchDistance) {
-                // Снижена чувствительность зума двумя пальцами
                 const delta = (currentDistance - initialPinchDistance) * 0.01;
                 setZoom(delta);
                 initialPinchDistance = currentDistance;
