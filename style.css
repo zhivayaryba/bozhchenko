@@ -328,3 +328,15 @@ CSS
     min-height: 50px; /* Чтобы текст в две строки не прыгал */
     color: #333;
 }
+
+#start-zoom-container {
+    width: 100%;
+    max-width: 500px; 
+    position: relative; 
+    border-radius: 8px;
+    background-color: transparent;
+    
+    /* Добавьте эти две строки: */
+    user-select: none;
+    -webkit-user-drag: none; 
+}
