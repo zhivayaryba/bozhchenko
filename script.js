@@ -501,6 +501,7 @@ function initStartScreen() {
 
     container.addEventListener('mouseup', (e) => {
         updateText(e.target);
+        lens.style.opacity = '0';
     });
 
     container.addEventListener('mouseleave', () => {
