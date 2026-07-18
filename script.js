@@ -488,20 +488,25 @@ function initStartScreen() {
     // ЛОГИКА ДЛЯ ПК (Мышь)
     // ==========================================
     container.addEventListener('mousemove', (e) => {
-        lens.style.opacity = '1'; 
         updateLoupePosition(e.clientX, e.clientY);
+        lens.style.opacity = '0';
         
         // Текст меняется только при зажатой ЛКМ
         if (e.buttons === 1) {
+            lens.style.opacity = '1'; 
             updateText(e.target);
             setHighlight(e.target);
         }
     });
 
-    container.addEventListener('mousedown', (e) => {
+    container.addEventListener('mouseup', (e) => {
         updateText(e.target);
     });
 
+    container.addEventListener('mouseleave', () => {
+        lens.style.opacity = '0';
+    });
+    
     // Изменение зума колесиком
     container.addEventListener('wheel', (e) => {
         e.preventDefault();
