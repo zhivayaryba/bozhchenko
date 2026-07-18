@@ -452,12 +452,47 @@ function initStartScreen() {
     setTimeout(() => setZoom(0), 100);
     window.addEventListener('resize', () => setZoom(0));
 
+// Получаем элементы нашего нового контейнера
+    const infoFlag = document.getElementById('start-info-flag');
+
+    // 3. Вывод текста локализации и флага
     function updateText(element) {
         const hitbox = element.closest('.hitbox');
+        
         if (hitbox && hitbox.id) {
-            infoText.innerText = t(hitbox.id);
+            const id = hitbox.id.toLowerCase();
+            
+            // Если ID состоит ровно из 2 букв (это штат, например, 'sc', 'rj')
+            if (id.length === 2) {
+                // Выводим текст локализации, склеив "uid_state_" + id
+                infoText.innerText = t("uid_state_" + id);
+                
+                // Ищем данные штата в массиве, который мы скачали из Google Sheets
+                const stateObj = quizData.stateData.find(s => s.state.toLowerCase() === id);
+                
+                if (stateObj && stateObj.flagData && stateObj.flagData.url) {
+                    infoFlag.src = stateObj.flagData.url;
+                    infoFlag.style.display = 'block'; // Показываем флаг
+                } else {
+                    infoFlag.style.display = 'none';
+                }
+            } else {
+                // Если это обычный символ (например, uid_symbol_romb)
+                infoText.innerText = t(id);
+                if (infoFlag) infoFlag.style.display = 'none'; // Скрываем флаг
+            }
         }
     }
+
+    // --- СБРОС ПРИ КЛИКЕ ВНЕ ФЛАГА ---
+    document.addEventListener('mousedown', (e) => {
+        // Если клик был не внутри контейнера с флагом
+        if (!container.contains(e.target)) {
+            clearHighlight();
+            if (infoText) infoText.innerText = ""; // Очищаем текст
+            if (infoFlag) infoFlag.style.display = 'none'; // Прячем флаг
+        }
+    });
 
     function updateLoupePosition(clientX, clientY) {
         const rect = container.getBoundingClientRect();
