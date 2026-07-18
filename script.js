@@ -422,6 +422,7 @@ function initStartScreen() {
 
     if (!container || !svg || !lens || !infoText) return;
 
+    let currentHighlighted = null;
     let zoomFactor = 8; // Начальный зум
     const minZoom = 2;   
     const maxZoom = 20; 
@@ -467,12 +468,32 @@ function initStartScreen() {
         lens.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
     }
 
+    // Функция сброса подсветки
+    function clearHighlight() {
+        if (currentHighlighted) {
+            currentHighlighted.classList.remove('active-hitbox');
+            currentHighlighted = null;
+        }
+    }
+
+    // Функция установки подсветки
+    function setHighlight(element) {
+        const hitbox = element.closest('.hitbox');
+        if (hitbox && hitbox !== currentHighlighted) {
+            clearHighlight();
+            currentHighlighted = hitbox;
+            currentHighlighted.classList.add('active-hitbox');
+        }
+    }
+    
     // ==========================================
     // ЛОГИКА ДЛЯ ПК (Мышь)
     // ==========================================
     container.addEventListener('mousemove', (e) => {
         lens.style.opacity = '1'; 
         updateLoupePosition(e.clientX, e.clientY);
+
+        setHighlight(e.target);
         
         // Текст меняется только при зажатой ЛКМ
         if (e.buttons === 1) {
@@ -517,6 +538,7 @@ function initStartScreen() {
             updateLoupePosition(touch.clientX, touch.clientY);
             const el = document.elementFromPoint(touch.clientX, touch.clientY);
             updateText(el);
+            setHighlight(el);
         } else if (e.touches.length === 2) {
             const currentDistance = getDistance(e.touches);
             if (initialPinchDistance) {
