@@ -425,10 +425,13 @@ function initStartScreen() {
     const minZoom = 2;   
     const maxZoom = 20; 
 
-    // 1. Подготовка линзы
-    const svgData = new XMLSerializer().serializeToString(svg);
-    const encodedData = encodeURIComponent(svgData);
-    lens.style.backgroundImage = `url('data:image/svg+xml;utf8,${encodedData}')`;
+    // 1. ФУНКЦИЯ ОБНОВЛЕНИЯ ФОНА ЛУПЫ
+    // Перезаписывает фон лупы, чтобы в ней отображались самые свежие изменения (например, подсветка)
+    function refreshLensBackground() {
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const encodedData = encodeURIComponent(svgData);
+        lens.style.backgroundImage = `url('data:image/svg+xml;utf8,${encodedData}')`;
+    }
 
     // 2. Обновление масштаба зума
     function setZoom(delta) {
@@ -438,7 +441,8 @@ function initStartScreen() {
         }
     }
     
-    // Применяем начальный зум
+    // Инициализация лупы
+    refreshLensBackground();
     setTimeout(() => setZoom(0), 100);
     window.addEventListener('resize', () => setZoom(0));
 
@@ -466,21 +470,29 @@ function initStartScreen() {
         lens.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
     }
 
-    // Функция сброса подсветки
+    // --- ФУНКЦИИ ПОДСВЕТКИ (С СИНХРОНИЗАЦИЕЙ ЛУПЫ) ---
     function clearHighlight() {
         if (currentHighlighted) {
             currentHighlighted.classList.remove('active-hitbox');
             currentHighlighted = null;
+            refreshLensBackground(); // Синхронизируем выключение
         }
     }
 
-    // Функция установки подсветки
     function setHighlight(element) {
         const hitbox = element.closest('.hitbox');
-        if (hitbox && hitbox !== currentHighlighted) {
-            clearHighlight();
+        
+        // Если мы всё ещё над тем же объектом — ничего не делаем
+        if (hitbox === currentHighlighted) return;
+        
+        // Очищаем старый хайлайт
+        clearHighlight();
+
+        // Если нашли новый объект — подсвечиваем
+        if (hitbox) {
             currentHighlighted = hitbox;
             currentHighlighted.classList.add('active-hitbox');
+            refreshLensBackground(); // Синхронизируем включение
         }
     }
     
@@ -541,8 +553,10 @@ function initStartScreen() {
             const touch = e.touches[0];
             updateLoupePosition(touch.clientX, touch.clientY);
             const el = document.elementFromPoint(touch.clientX, touch.clientY);
-            updateText(el);
-            setHighlight(el);
+            if (el) {
+                updateText(el);
+                setHighlight(el);
+            }
         } else if (e.touches.length === 2) {
             const currentDistance = getDistance(e.touches);
             if (initialPinchDistance) {
@@ -554,9 +568,6 @@ function initStartScreen() {
     }, { passive: false });
 
     container.addEventListener('touchend', () => lens.style.opacity = '0');
-
-    // Уход мыши
-    container.addEventListener('mouseleave', () => lens.style.opacity = '0');
 }
 
 function initInlineSVGLoupe(containerId, lensId, svgId, checkHolding) {
@@ -595,4 +606,4 @@ function initInlineSVGLoupe(containerId, lensId, svgId, checkHolding) {
     };
 }
 
-initializeApp();
+document.addEventListener('DOMContentLoaded', initializeApp);
