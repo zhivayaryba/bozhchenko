@@ -152,7 +152,7 @@ body {
 }
 
 #start-info-flag {
-    width: 60%; /* Флаг занимает 60% ширины карточки */
+    width: 40%; /* Флаг занимает 60% ширины карточки */
     aspect-ratio: 1.5 / 1;
     object-fit: contain;
     border: 1px solid #ddd;
