@@ -674,6 +674,14 @@ function initStartScreen() {
                 updateText(target);
             }
         });
+
+        topMap.addEventListener('click', (e) => {
+            const target = getStateTarget(e.target);
+            if (target) {
+                highlightStateAndFlag(target);
+                updateText(target);
+            }
+        });
     }
     
     // СНИЖЕННАЯ ЧУВСТВИТЕЛЬНОСТЬ КОЛЕСИКА (шаг 0.2 вместо 0.5)
