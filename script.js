@@ -624,32 +624,47 @@ function initStartScreen() {
     const topMap = document.getElementById('brazil-map');
     
     if (topMap) {
+        // 1. Сканирование только при ЗАЖАТОЙ левой кнопке мыши
         topMap.addEventListener('mousemove', (e) => {
+            if (e.buttons === 1) { // Проверяем зажатие ЛКМ
+                const target = e.target.closest('.map-state');
+                if (target) {
+                    setHighlight(target);
+                    updateText(target);
+                } else {
+                    // Если ведем зажатой мышкой по океану - сбрасываем карточку
+                    clearHighlight();
+                    if (infoText) infoText.innerText = ""; 
+                    if (infoFlag) infoFlag.style.visibility = 'hidden'; 
+                }
+            }
+        });
+
+        // 2. Отрабатываем момент самого первого клика (чтобы карточка появлялась сразу)
+        topMap.addEventListener('mousedown', (e) => {
             const target = e.target.closest('.map-state');
             if (target) {
                 setHighlight(target);
                 updateText(target);
-            } else {
-                clearHighlight();
-                if (infoText) infoText.innerText = ""; 
-                if (infoFlag) infoFlag.style.visibility = 'hidden'; 
             }
         });
 
+        // 3. Убираем мышь с карты — сбрасываем всё
         topMap.addEventListener('mouseleave', () => {
             clearHighlight();
             if (infoText) infoText.innerText = ""; 
             if (infoFlag) infoFlag.style.visibility = 'hidden'; 
         });
 
+        // 4. Обычный клик (нажал-отпустил) по штату для старта викторины
         topMap.addEventListener('click', (e) => {
             const target = e.target.closest('.map-state');
             if (target && target.id) {
                 const stateId = target.id.toLowerCase().trim();
                 if (stateId.length === 2) {
                     clearHighlight();
-                    lens.style.opacity = '0';
-                    startCityQuiz(stateId); // Переход к квизу по клику на карту
+                    if (lens) lens.style.opacity = '0'; // Прячем лупу флага на всякий случай
+                    startCityQuiz(stateId); 
                 }
             }
         });
