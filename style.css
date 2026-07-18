@@ -1,34 +1,176 @@
+/* =========================================
+   1. ГЛОБАЛЬНЫЕ НАСТРОЙКИ И СБРОС
+   ========================================= */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body {
-    background-color: #f0f2f5;
+    background-color: #e9ecef;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 20px;
-}
-
-.app-container {
-    background: #ffffff;
-    width: 100%;
-    max-width: 1200px; /* Увеличили для вместимости 3 колонок */
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    padding: 30px;
-    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .hidden {
     display: none !important;
 }
 
-/* Стили флага */
+/* =========================================
+   2. ОСНОВНЫЕ КОНТЕЙНЕРЫ
+   ========================================= */
+.mobile-layout {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 414px;
+    height: 100vh;
+    max-height: 900px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.app-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 1200px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 30px;
+    text-align: center;
+}
+
+.top-placeholder {
+    width: 100%;
+    height: 250px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =========================================
+   3. ИНТЕРАКТИВНЫЙ ФЛАГ И ЛУПА (START SCREEN)
+   ========================================= */
+#start-flag-zone {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#start-zoom-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    border-radius: 8px;
+    background-color: transparent;
+    cursor: crosshair;
+    user-select: none;
+    -webkit-user-drag: none;
+    touch-action: none;
+}
+
+#start-zoom-container:active {
+    cursor: none !important;
+}
+
+#start-svg-flag {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+#start-lens {
+    pointer-events: none;
+}
+
+/* Зоны клика (Hitboxes) */
+.hitbox {
+    cursor: none; 
+}
+
+#start-svg-flag .hitbox g path,
+#start-svg-flag .hitbox path[fill="white"] {
+    stroke: rgba(255, 255, 255, 0);
+    stroke-width: 15px;
+    stroke-linejoin: round;
+}
+
+.active-hitbox {
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1)) brightness(1.5);
+}
+
+/* =========================================
+   4. ИНФОРМАЦИОННАЯ КАРТОЧКА
+   ========================================= */
+#start-info-zone {
+    width: 100%;
+    height: 120px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.info-card {
+    background-color: #fcfcfc;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px auto 0 auto;
+    width: 100%;
+    max-width: 500px;
+    height: 230px; 
+    flex-shrink: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+#start-info-text {
+    font-family: 'Garamond', 'EB Garamond', 'Times New Roman', serif;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: #2c3e50;
+    margin: 0 auto;
+    min-height: 55px;
+    max-width: 440px;
+}
+
+#start-info-flag {
+    width: 240px;
+    height: 198px;
+    object-fit: contain;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-top: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    visibility: hidden;
+}
+
+/* =========================================
+   5. ЭКРАН КВИЗА И КНОПКИ
+   ========================================= */
+#quiz-screen {
+    max-width: 400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
 .flag-container {
     margin: 30px 0;
     min-height: 200px;
@@ -45,17 +187,9 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* 1. Ограничиваем ширину только для экрана с вопросом */
-#quiz-screen {
-    max-width: 400px; /* Идеальная ширина под размер флага */
-    margin: 0 auto;   /* Центрируем этот блок внутри большого окна */
-    width: 100%;
-}
-
-/* 2. Делаем кнопки в один столбик */
 .options-grid {
     display: grid;
-    grid-template-columns: 1fr; /* БЫЛО: 1fr 1fr (два столбца). СТАЛО: 1fr (один) */
+    grid-template-columns: 1fr;
     gap: 12px;
     margin-top: 20px;
 }
@@ -76,8 +210,20 @@ button {
 }
 
 .option-btn:hover {
-    border-color: #009c3b; /* Зеленый цвет Бразилии */
+    border-color: #009c3b;
     background: #f0fff4;
+}
+
+.option-btn.correct {
+    background-color: #28a745 !important;
+    color: white !important;
+    border-color: #28a745 !important;
+}
+
+.option-btn.wrong {
+    background-color: #dc3545 !important;
+    color: white !important;
+    border-color: #dc3545 !important;
 }
 
 .primary-btn {
@@ -86,94 +232,19 @@ button {
     color: white;
     border: none;
     margin-top: 20px;
-    /* width: 100%; <--- УДАЛИТЬ ЭТО */
-    min-width: 250px; /* <--- ДОБАВИТЬ ЭТО */
-    border-radius: 8px; /* Добавим скругление для красоты */
+    min-width: 250px;
+    border-radius: 8px;
     font-size: 16px;
     font-weight: bold;
-    cursor: pointer;
 }
 
 .primary-btn:hover {
     background: #004080;
 }
 
-/* ВАЖНО: Лупа больше не будет перехватывать мышь! */
-#start-lens {
-    pointer-events: none; 
-}
-
-.info-card {
-    background-color: #fcfcfc;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px auto 0 auto;
-    width: 100%;
-    max-width: 500px;
-    
-    /* ИСПРАВЛЕНИЕ: Жестко фиксируем высоту */
-    height: 230px; 
-    box-sizing: border-box; /* Чтобы padding не увеличивал высоту */
-    
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    text-align: center;
-}
-
-/* Шрифт Garamond для текста */
-#start-info-text {
-    font-family: 'Garamond', 'EB Garamond', 'Times New Roman', serif;
-    font-size: 1.0 rem;
-    line-height: 1.5;
-    color: #2c3e50;
-    margin: 0 auto;
-    min-height: 55px; /* Резервируем место под 2-3 строки текста */
-}
-
-/* Флаг штата внутри контейнера */
-#start-info-flag {
-    width: 240px;
-    height: 198px; /* Жестко задаем высоту (пропорция ~7:10), чтобы ничего не прыгало */
-    object-fit: contain; /* Картинка аккуратно впишется в эти размеры */
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-top: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    visibility: hidden; /* По умолчанию скрыт, но МЕСТО ЗАНИМАЕТ */
-}
-
-.badge {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 20px;
-    color: white;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-/* Адаптация для мобильных */
-@media (max-width: 768px) {
-    .options-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    /* Делаем три колонки одним столбцом на телефоне */
-    .context-grid-3col {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    /* Уменьшаем карту для телефона */
-    #city-map {
-        height: 200px; 
-    }
-}
-
-/* Сетка выбора штатов */
+/* =========================================
+   6. СЕТКА ВЫБОРА ШТАТОВ
+   ========================================= */
 .states-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -210,27 +281,26 @@ button {
     color: #333;
 }
 
-/* Делаем экран контекста гибким контейнером */
+/* =========================================
+   7. ЭКРАН КОНТЕКСТА (РЕЗУЛЬТАТЫ)
+   ========================================= */
 #context-screen {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Центрируем всё по горизонтали */
+    align-items: center;
     padding: 20px;
 }
 
-/* Трехколоночная сетка */
 .context-grid-3col {
     display: grid;
-    /* Левая колонка (карта), центр (флаг), правая (информация) */
-    grid-template-columns: 1fr 350px 1fr; /* Задали центру фиксированные 350px под размер флага */
+    grid-template-columns: 1fr 350px 1fr;
     gap: 30px;
     width: 100%;
     max-width: 1200px;
-    align-items: center; /* Центрируем карту и текст по высоте относительно флага */
+    align-items: center;
     margin: 20px 0;
 }
 
-/* Настройки панелей, чтобы они не сжимались слишком сильно */
 .panel-left, .panel-right {
     width: 100%;
     min-width: 250px;
@@ -242,20 +312,18 @@ button {
     align-items: center;
 }
 
-/* Настройки карты */
 #city-map {
     width: 100%;
     height: 300px;
-    border-radius: 12px; /* Чуть мягче скруглим углы */
+    border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     border: 1px solid #e1e4e8;
 }
 
-/* Контейнер флага и лупы */
 .zoom-container {
     position: relative;
     display: inline-block;
-    cursor: crosshair; /* Меняем курсор на прицел */
+    cursor: crosshair;
 }
 
 #context-flag-image {
@@ -266,7 +334,7 @@ button {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* Внешний вид лупы */
+/* Внешний вид лупы (Контекст) */
 .lens {
     position: absolute;
     width: 150px;
@@ -276,54 +344,47 @@ button {
     cursor: none;
     background-repeat: no-repeat;
     opacity: 0;
-    transition: opacity 0.15s ease; /* Убрали анимацию масштаба, лупа всегда готова */
+    transition: opacity 0.15s ease;
     pointer-events: none;
     z-index: 10;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4); /* Добавили тень для объема */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
 
-/* Прицел - горизонтальная линия */
-.lens::before {
+.lens::before, .lens::after {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
+    background-color: rgba(255, 0, 0, 0.8);
+    transform: translate(-50%, -50%);
+}
+
+.lens::before {
     width: 20px;
     height: 2px;
-    background-color: rgba(255, 0, 0, 0.8);
-    transform: translate(-50%, -50%);
 }
 
-/* Прицел - вертикальная линия */
 .lens::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
     width: 2px;
     height: 20px;
-    background-color: rgba(255, 0, 0, 0.8);
-    transform: translate(-50%, -50%);
 }
 
 .zoom-container:hover .lens {
-    opacity: 1; /* Показываем при наведении */
+    opacity: 1;
 }
 
-/* Цвета кнопок при выборе ответа */
-.option-btn.correct {
-    background-color: #28a745 !important;
-    color: white !important;
-    border-color: #28a745 !important;
+/* =========================================
+   8. ЭЛЕМЕНТЫ ИНТЕРФЕЙСА (БЕЙДЖИ)
+   ========================================= */
+.badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    margin-bottom: 15px;
 }
 
-.option-btn.wrong {
-    background-color: #dc3545 !important;
-    color: white !important;
-    border-color: #dc3545 !important;
-}
-
-/* Цвета плашки на экране справки */
 #result-badge {
     font-size: 1.5rem;
     font-weight: bold;
@@ -339,112 +400,20 @@ button {
     color: #dc3545;
 }
 
-Да, чтобы этот HTML «ожил», нам нужно добавить логику в JavaScript (чтобы лупа читала SVG и выводился текст) и пару строк в CSS (чтобы зафиксировать размеры).
-
-Вот точные куски кода, которые нужно добавить или обновить в ваших файлах.
-
-1. В файл style.css
-Добавьте этот блок, чтобы жестко зафиксировать экран и убрать стандартный курсор над интерактивными зонами:
-
-CSS
-#start-flag-zone {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-#start-zoom-container {
-    width: 100%;
-    max-width: 500px; 
-    position: relative; /* Обязательно для лупы */
-    border-radius: 8px;
-    background-color: transparent;
-}
-
-#start-svg-flag {
-    width: 100%;
-    height: auto; /* SVG сам задает высоту пропорционально ширине */
-    display: block;
-    /* Мы убрали position: absolute, теперь флаг физически занимает место */
-}
-
-/* Прячем обычную мышку над интерактивными зонами флага */
-.hitbox {
-    cursor: none; 
-}
-
-/* Фиксация зоны текста */
-#start-info-zone {
-    width: 100%;
-    height: 120px; 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Оформление карточки информации */
-.info-card {
-    background-color: #fcfcfc;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 20px;
-    margin-top: 20px;
-    min-height: 140px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;    /* Центрирует все элементы по горизонтали */
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    text-align: center;
-    width: 100%;
-}
-
-/* Шрифт Garamond для текста */
-#start-info-text {
-    font-family: 'Garamond', 'EB Garamond', 'Times New Roman', serif;
-    font-size: 1.2rem;
-    line-height: 1.5;
-    color: #2c3e50;
-    margin: 0 auto;
-    max-width: 440px; /* Ограничиваем ширину (чуть уже основного флага) */
-    text-align: center; /* Текст внутри блока тоже по центру */
-}
-
-/* Флаг штата внутри контейнера */
-#start-info-flag {
-    width: 140px; /* Делаем флаг крупнее */
-    height: auto;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-top: 15px; /* Аккуратный отступ от текста */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    display: block;
-}
-
-#start-zoom-container {
-    width: 100%;
-    max-width: 500px; 
-    position: relative; 
-    border-radius: 8px;
-    background-color: transparent;
-    user-select: none;
-    -webkit-user-drag: none; 
-    /* НОВОЕ: Запрещаем стандартные жесты браузера (скролл/зум) над флагом */
-    touch-action: none; 
-}
-
-/* Увеличиваем физическую зону попадания для мелких элементов (звезды и буквы) */
-#start-svg-flag .hitbox g path,
-#start-svg-flag .hitbox path[fill="white"] {
-    stroke: rgba(255, 255, 255, 0); /* Абсолютно прозрачная обводка */
-    stroke-width: 15px; /* Толщина невидимого "щита" для клика */
-    stroke-linejoin: round;
-}
-
-/* Сам эффект свечения (чтобы не перебивал нашу невидимую обводку) */
-.active-hitbox {
-    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1)) brightness(1.5);
+/* =========================================
+   9. АДАПТИВНОСТЬ (МЕДИА-ЗАПРОСЫ)
+   ========================================= */
+@media (max-width: 768px) {
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .context-grid-3col {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    #city-map {
+        height: 200px; 
+    }
 }
