@@ -467,20 +467,43 @@ function initStartScreen() {
             
             if (id.length === 2) {
                 infoText.innerText = t("uid_state_" + id);
+                
                 const stateObj = quizData.stateData.find(s => s.state.toLowerCase().trim() === id);
                 
                 if (stateObj && stateObj.flagData && stateObj.flagData.url) {
                     infoFlag.src = stateObj.flagData.url;
-                    infoFlag.style.visibility = 'visible'; // Показываем флаг (место уже есть)
+                    infoFlag.style.visibility = 'visible'; 
+                    
+                    // НОВОЕ: Сохраняем ID штата в атрибут data-target-state
+                    infoFlag.dataset.targetState = stateObj.state; 
                 } else {
-                    infoFlag.style.visibility = 'hidden'; // Скрываем, оставляя пустое место
+                    infoFlag.style.visibility = 'hidden';
+                    infoFlag.dataset.targetState = ""; // Очищаем, если флага нет
                 }
             } else {
                 infoText.innerText = t(id);
-                if (infoFlag) infoFlag.style.visibility = 'hidden'; 
+                if (infoFlag) {
+                    infoFlag.style.visibility = 'hidden';
+                    infoFlag.dataset.targetState = "";
+                }
             }
         }
     }
+
+    // --- НОВОЕ: ОБРАБОТЧИК КЛИКА ПО ФЛАГУ ---
+    infoFlag.addEventListener('click', () => {
+        const stateId = infoFlag.dataset.targetState;
+        
+        // Если у флага есть ID штата, запускаем квиз
+        if (stateId) {
+            // Сбрасываем подсветку и лупу перед уходом на другой экран
+            clearHighlight();
+            lens.style.opacity = '0';
+            
+            // Запускаем викторину для выбранного штата
+            startCityQuiz(stateId); 
+        }
+    });
 
     // --- СБРОС ПРИ КЛИКЕ ВНЕ ФЛАГА ---
     document.addEventListener('mousedown', (e) => {
