@@ -428,3 +428,36 @@ button {
         height: 200px; 
     }
 }
+
+/* =========================================
+   СТИЛИ ДЛЯ ВЕРХНЕЙ КАРТЫ
+   ========================================= */
+#top-map-container {
+    width: 100%;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#brazil-map {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Базовый вид штатов на карте */
+.map-state {
+    fill: #cccccc; /* Серый цвет по умолчанию */
+    stroke: #ffffff;
+    stroke-width: 1px;
+    transition: fill 0.2s ease;
+    cursor: pointer;
+}
+
+/* Красная подсветка активного штата */
+.active-map-state {
+    fill: #dc3545 !important; /* Красный цвет */
+}
