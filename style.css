@@ -103,19 +103,23 @@ button {
     pointer-events: none; 
 }
 
-/* Оформление карточки информации */
 .info-card {
     background-color: #fcfcfc;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 20px;
-    margin: 20px auto 0 auto; /* Центрируем сам контейнер по горизонтали */
-    min-height: 400px; /* Резервируем высоту для текста и флага */
-    max-width: 500px; /* Делаем контейнер аккуратным и узким */
+    margin: 20px auto 0 auto;
+    width: 100%;
+    max-width: 550px;
+    
+    /* ИСПРАВЛЕНИЕ: Жестко фиксируем высоту */
+    height: 250px; 
+    box-sizing: border-box; /* Чтобы padding не увеличивал высоту */
+    
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Прижимаем контент к верху, чтобы он не прыгал */
+    justify-content: flex-start;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     text-align: center;
 }
