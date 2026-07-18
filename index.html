@@ -364,10 +364,11 @@
             </div>
         </div>
     
-        <!-- БЛОК 2: Фиксированный контейнер для текста и кнопки -->
+    <!-- БЛОК 2: Фиксированный контейнер для текста и кнопки -->
         <div id="start-info-zone">
-            <h2 id="start-info-text">Наведите лупу на элементы флага</h2>
-            <button id="start-btn" class="primary-btn" onclick="startGame()">Начать квиз</button>
+            <!-- Убрали хардкод, добавили data-i18n -->
+            <h2 id="start-info-text" data-i18n="uid_start_instruction"></h2>
+            <button id="start-btn" class="primary-btn" data-i18n="uid_start_btn" onclick="startGame()"></button>
         </div>
     </div>
 
