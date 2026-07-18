@@ -663,12 +663,6 @@ function initStartScreen() {
                 if (target) {
                     highlightStateAndFlag(target);
                     updateText(target);
-                } else {
-                    // Если ведем зажатой мышкой по океану или фону - сбрасываем карточку
-                    clearHighlight();
-                    currentHighlightedId = null;
-                    if (infoText) infoText.innerText = ""; 
-                    if (infoFlag) infoFlag.style.visibility = 'hidden'; 
                 }
             }
         });
@@ -679,26 +673,6 @@ function initStartScreen() {
             if (target) {
                 highlightStateAndFlag(target);
                 updateText(target);
-            }
-        });
-    
-        // 3. Убираем мышь с карты — сбрасываем всё
-        topMap.addEventListener('mouseleave', () => {
-            clearHighlight();
-            currentHighlightedId = null;
-            if (infoText) infoText.innerText = ""; 
-            if (infoFlag) infoFlag.style.visibility = 'hidden'; 
-        });
-    
-        // 4. Обычный клик (нажал-отпустил) по штату для старта викторины
-        topMap.addEventListener('click', (e) => {
-            const target = getStateTarget(e.target);
-            if (target) {
-                const stateId = target.id.toLowerCase().trim();
-                clearHighlight();
-                currentHighlightedId = null;
-                if (lens) lens.style.opacity = '0'; 
-                startCityQuiz(stateId); 
             }
         });
     }
