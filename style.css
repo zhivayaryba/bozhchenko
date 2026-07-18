@@ -110,10 +110,10 @@ button {
     padding: 20px;
     margin: 20px auto 0 auto;
     width: 100%;
-    max-width: 550px;
+    max-width: 500px;
     
     /* ИСПРАВЛЕНИЕ: Жестко фиксируем высоту */
-    height: 250px; 
+    height: 230px; 
     box-sizing: border-box; /* Чтобы padding не увеличивал высоту */
     
     display: flex;
@@ -127,7 +127,7 @@ button {
 /* Шрифт Garamond для текста */
 #start-info-text {
     font-family: 'Garamond', 'EB Garamond', 'Times New Roman', serif;
-    font-size: 1.2rem;
+    font-size: 1.0 rem;
     line-height: 1.5;
     color: #2c3e50;
     margin: 0 auto;
