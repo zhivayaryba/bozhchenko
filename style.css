@@ -372,12 +372,43 @@ CSS
     align-items: center;
 }
 
-#start-info-text {
-    font-size: 18px;
-    margin-bottom: 20px;
+/* Оформление карточки информации */
+.info-card {
+    background-color: #fcfcfc;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* Центрирует все элементы по горизонтали */
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     text-align: center;
-    min-height: 50px; /* Чтобы текст в две строки не прыгал */
-    color: #333;
+    width: 100%;
+}
+
+/* Шрифт Garamond для текста */
+#start-info-text {
+    font-family: 'Garamond', 'EB Garamond', 'Times New Roman', serif;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: #2c3e50;
+    margin: 0 auto;
+    max-width: 440px; /* Ограничиваем ширину (чуть уже основного флага) */
+    text-align: center; /* Текст внутри блока тоже по центру */
+}
+
+/* Флаг штата внутри контейнера */
+#start-info-flag {
+    width: 140px; /* Делаем флаг крупнее */
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-top: 15px; /* Аккуратный отступ от текста */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    display: block;
 }
 
 #start-zoom-container {
