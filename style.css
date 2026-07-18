@@ -360,8 +360,8 @@ CSS
     position: relative; 
     border-radius: 8px;
     background-color: transparent;
-    
-    /* Добавьте эти две строки: */
     user-select: none;
     -webkit-user-drag: none; 
+    /* НОВОЕ: Запрещаем стандартные жесты браузера (скролл/зум) над флагом */
+    touch-action: none; 
 }
