@@ -525,30 +525,44 @@ function initStartScreen() {
         }
     }
     
-    // --- ЛОГИКА ДЛЯ ПК ---
+    // ЛОГИКА ДЛЯ ПК (Мышь)
+    // ==========================================
+    container.style.cursor = 'crosshair'; // Базовый курсор при наведении
+
+    container.addEventListener('mousedown', (e) => {
+        container.style.cursor = 'none'; // Прячем курсор при нажатии
+        updateText(e.target);
+        setHighlight(e.target);
+    });
+
     container.addEventListener('mousemove', (e) => {
         updateLoupePosition(e.clientX, e.clientY);
         
         if (e.buttons === 1) {
             lens.style.opacity = '1'; 
-            container.style.cursor = 'none'; // ИСПРАВЛЕНИЕ 1: Скрываем курсор, когда лупа активна
+            container.style.cursor = 'none'; // Убеждаемся, что курсор скрыт при перетаскивании
             updateText(e.target);
             setHighlight(e.target);
         } else {
             lens.style.opacity = '0';
-            container.style.cursor = 'crosshair'; // ИСПРАВЛЕНИЕ 1: Показываем курсор, когда просто ведем
+            container.style.cursor = 'crosshair'; // Показываем прицел при простом ведении
         }
     });
     
     container.addEventListener('mouseup', (e) => {
         updateText(e.target);
         lens.style.opacity = '0';
-        container.style.cursor = 'crosshair'; // Возвращаем курсор при отпускании
+        container.style.cursor = 'crosshair'; // Возвращаем курсор при отпускании кнопки
     });
 
     container.addEventListener('mouseleave', () => {
         lens.style.opacity = '0';
-        container.style.cursor = 'default';
+        container.style.cursor = 'default'; // Обычная стрелка мыши вне флага
+    });
+
+    container.addEventListener('mouseenter', (e) => {
+        // Если зашли на флаг с уже зажатой кнопкой - прячем, иначе крестик
+        container.style.cursor = (e.buttons === 1) ? 'none' : 'crosshair';
     });
     
     // СНИЖЕННАЯ ЧУВСТВИТЕЛЬНОСТЬ КОЛЕСИКА (шаг 0.2 вместо 0.5)
