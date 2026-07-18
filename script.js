@@ -532,7 +532,6 @@ function initStartScreen() {
 
     container.addEventListener('mouseleave', () => {
         lens.style.opacity = '0';
-        clearHighlight();
     });
     
     // Изменение зума колесиком
