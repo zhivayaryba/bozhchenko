@@ -227,21 +227,19 @@ button {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* Сама линза */
 .lens {
     position: absolute;
-    border: 3px solid #fff;
-    border-radius: 50%; /* Делаем ее круглой */
-    width: 150px; 
+    width: 150px;
     height: 150px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    cursor: none;
     background-repeat: no-repeat;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    pointer-events: none; /* Чтобы мышка "не спотыкалась" об линзу */
-    /* Прячем до наведения */
-    opacity: 0; 
-    transition: opacity 0.2s;
-    /* Центрируем линзу относительно курсора */
-    transform: translate(-50%, -50%); 
+    opacity: 0;
+    /* Плавный переход для удержания клика */
+    transition: opacity 0.15s ease, transform 0.15s ease; 
+    pointer-events: none;
+    z-index: 10;
 }
 
 .zoom-container:hover .lens {
