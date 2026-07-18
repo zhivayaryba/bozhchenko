@@ -124,7 +124,7 @@ body {
 
 .info-card {
     background-color: #fcfcfc;
-    border: 1px solid #e0e0e0;
+    border: none;
     border-radius: 8px;
     padding: 10px;
     margin: 20px auto 0 auto;
