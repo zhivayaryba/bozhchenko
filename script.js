@@ -32,26 +32,20 @@ window.changeLanguage = function(lang) {
         renderStateSelection();
     }
     
-    // ДОБАВЛЕННЫЙ БЛОК: Динамический перевод текста на экране контекста
+    // Динамический перевод текста на экране контекста
     if (screens.context && !screens.context.classList.contains('hidden') && activeTargetCity) {
         document.getElementById('context-symbolism').innerText = activeTargetCity.hist;
 
-        // Логика мотто (бронебойная проверка)
+        // Логика мотто
         const mottoCont = document.getElementById('motto-container');
-        const mottoKey = activeTargetCity.mottoKey; // Оригинальный ключ из таблицы
-        const translatedMotto = activeTargetCity.motto; // Попытка перевода
+        const mottoKey = activeTargetCity.mottoKey;
+        const translatedMotto = activeTargetCity.motto;
 
-        // 1. Очищаем от пробелов, табов и \r\n
         const cleanKey = mottoKey ? mottoKey.trim() : "";
         const cleanTranslation = translatedMotto ? translatedMotto.trim() : "";
 
-        // 2. Блокируем, если:
-        // - Ключ пустой
-        // - Ключ равен "N/A" (если вы так заполняли таблицу)
-        // - Перевод равен самому ключу (нет в словаре)
-        // - Перевод пустой
         if (!cleanKey || cleanKey.toUpperCase() === "N/A" || cleanTranslation === cleanKey || cleanTranslation === "") {
-            mottoCont.style.display = 'none'; // Жестко прячем блок
+            mottoCont.style.display = 'none';
         } else {
             mottoCont.style.display = 'block';
             document.getElementById('context-motto').innerText = cleanTranslation;
@@ -68,7 +62,7 @@ class FlagData {
     constructor(url, coord, coatUrl) {
         this.url = url;
         this.coord = coord;
-        this.coatUrl = coatUrl; // Теперь это здесь
+        this.coatUrl = coatUrl;
     }
 }
 
@@ -94,7 +88,7 @@ class CidadeData {
         this.nameKey = nameKey;
         this.mottoKey = mottoKey;
         this.histKey = histKey;
-        this.flagData = flagData; // Здесь лежит и url, и coord, и coatUrl
+        this.flagData = flagData;
     }
 
     get name() { return t(this.nameKey); }
@@ -108,7 +102,7 @@ const quizData = {
 };
 
 let currentIndex = 0;
-let activeTargetCity = null; // Запоминает город, который мы сейчас рассматриваем
+let activeTargetCity = null;
 let score = 0;
 let currentQuizArray = [];
 
@@ -139,7 +133,6 @@ async function initializeApp() {
     const startBtn = document.getElementById('start-btn');
     if (startBtn) {
         startBtn.disabled = true;
-        // Заглушка до того, как загрузятся словари (потом переведется)
         startBtn.innerText = "Carregando..."; 
     }
 
@@ -175,24 +168,22 @@ async function initializeApp() {
         // 3. Города
         const parsedCidades = parseTSV(cidadesText);
         parsedCidades.forEach(row => {
-        // Создаем объект флага с учетом coat_url
-        const flag = new FlagData(row.url, row.coord, row.coatUrl); 
-        // Теперь передаем в конструктор города только cityId, stateId, nameKey, mottoKey, histKey и flag
-        const city = new CidadeData(row.city, row.state, row.name, row.motto, row.hist, flag);
-        quizData.cidadeData.push(city);
+            const flag = new FlagData(row.url, row.coord, row.coatUrl); 
+            const city = new CidadeData(row.city, row.state, row.name, row.motto, row.hist, flag);
+            quizData.cidadeData.push(city);
         });
 
-        // Применяем язык по умолчанию ко всему интерфейсу
         changeLanguage(currentLang);
 
         if (startBtn) {
             startBtn.disabled = false;
         }
 
+        // АКТИВИРУЕМ ЛОГИКУ СТАРТОВОГО ЭКРАНА
+        initStartScreen();
+
     } catch (error) {
         console.error(error);
-        // Если словари не загрузились, обращаемся к t(), но он вернет ключ.
-        // Поэтому для ошибки критического сбоя можно оставить хардкод, либо надеяться на словарь.
         if (startBtn) {
             startBtn.innerText = t("uid_error_loading"); 
         }
@@ -261,7 +252,6 @@ function loadQuestion() {
     document.getElementById('current-q-num').innerText = currentIndex + 1;
     document.getElementById('flag-image').src = targetCity.flagData.url;
 
-    // Запускаем лупу для экрана вопроса
     initLoupeEffect(targetCity.flagData.url, targetCity.flagData.coatUrl, 'quiz-flag-zoom-container', 'quiz-zoom-lens', 'flag-image');
     
     const allCitiesInState = quizData.cidadeData.filter(city => city.state === targetCity.state);
@@ -276,10 +266,10 @@ function loadQuestion() {
     
     optionsObjects.forEach(cityObj => {
         const btn = document.createElement('button');
-        btn.innerText = cityObj.name; // БЫЛО: option.name
+        btn.innerText = cityObj.name; 
         btn.className = 'option-btn'; 
-        btn.dataset.id = cityObj.city; // БЫЛО: option.city
-        btn.onclick = () => checkAnswer(cityObj.city, targetCity); // БЫЛО: currentTarget
+        btn.dataset.id = cityObj.city; 
+        btn.onclick = () => checkAnswer(cityObj.city, targetCity); 
         optionsContainer.appendChild(btn);
     });
 }
@@ -288,28 +278,24 @@ function checkAnswer(selectedCityId, targetCity) {
     activeTargetCity = targetCity; 
     const isCorrect = (selectedCityId === targetCity.city);
     
-    // 1. ПОДСВЕТКА КНОПОК
     const options = document.querySelectorAll('#options-container button');
     options.forEach(btn => {
-        btn.disabled = true; // Блокируем кнопки от двойного клика
+        btn.disabled = true; 
         
         if (btn.dataset.id === targetCity.city) {
-            btn.classList.add('correct'); // Всегда подсвечиваем правильный ответ зеленым
+            btn.classList.add('correct'); 
         } else if (btn.dataset.id === selectedCityId && !isCorrect) {
-            btn.classList.add('wrong'); // Если игрок выбрал этот ответ и он неверный - красным
+            btn.classList.add('wrong'); 
         }
     });
 
-    // 2. ЖДЕМ 1 СЕКУНДУ И ПЕРЕХОДИМ НА ЭКРАН СПРАВКИ
     setTimeout(() => {
         const resultBadge = document.getElementById('result-badge');
         
-        // Заполняем данные контекста
         document.getElementById('context-flag-image').src = targetCity.flagData.url;
         document.getElementById('context-city-name').innerText = targetCity.name;
         document.getElementById('context-symbolism').innerText = targetCity.hist; 
         
-        // --- БРОНЕБОЙНАЯ ЛОГИКА МОТТО ---
         const mottoCont = document.getElementById('motto-container');
         const mottoKey = activeTargetCity.mottoKey; 
         const translatedMotto = activeTargetCity.motto; 
@@ -318,14 +304,12 @@ function checkAnswer(selectedCityId, targetCity) {
         const cleanTranslation = translatedMotto ? translatedMotto.trim() : "";
 
         if (!cleanKey || cleanKey.toUpperCase() === "N/A" || cleanTranslation === cleanKey || cleanTranslation === "") {
-            mottoCont.style.display = 'none'; // Жестко прячем блок
+            mottoCont.style.display = 'none'; 
         } else {
             mottoCont.style.display = 'block';
             document.getElementById('context-motto').innerText = cleanTranslation;
         }
-        // --------------------------------
 
-        // Обновляем текст и цвет плашки на экране справки
         if (isCorrect) {
             score++;
             resultBadge.innerText = t("uid_correct");
@@ -335,20 +319,17 @@ function checkAnswer(selectedCityId, targetCity) {
             resultBadge.className = "badge badge-wrong";
         }
 
-        // Показываем экран
         hideAllScreens();
         screens.context.classList.remove('hidden');
 
-        // Даем браузеру 150мс на то, чтобы отрисовать CSS, и только потом рендерим карту и лупу
         setTimeout(() => {
             if (targetCity.flagData.coord) {
                 setupMap(targetCity.flagData.coord);
             }
-            // Запускаем лупу для экрана справки (ОБНОВЛЕННЫЙ ВЫЗОВ)
             initLoupeEffect(targetCity.flagData.url, targetCity.flagData.coatUrl, 'flag-zoom-container', 'zoom-lens', 'context-flag-image');
         }, 150);
 
-    }, 1000); // 1 секунда задержки
+    }, 1000); 
 }
 
 function nextQuestion() {
@@ -365,14 +346,8 @@ function nextQuestion() {
     }
 }
 
-initializeApp();
-
 // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
-let mapInstance = null; // Храним карту здесь
-
-// --- ФУНКЦИИ ЛУПЫ И КАРТЫ ---
-
-// --- ФУНКЦИИ ЛУПЫ И КАРТЫ ---
+let mapInstance = null; 
 
 function setupMap(coordString) {
     const match = coordString.match(/Point\(([^ ]+) ([^)]+)\)/);
@@ -388,7 +363,6 @@ function setupMap(coordString) {
         }).addTo(mapInstance);
     }
     
-    // Обязательный пересчет размера для Leaflet после снятия display: none
     mapInstance.invalidateSize(); 
     mapInstance.setView([lat, lon], 11);
     
@@ -405,20 +379,16 @@ function initLoupeEffect(flagUrl, coatUrl, containerId, lensId, imgId) {
 
     if (!container || !lens || !img) return;
 
-    // ВАЖНО: используем coatUrl, если он есть и не пустой
     const cleanCoatUrl = (coatUrl && coatUrl.trim() !== "") ? coatUrl.trim() : flagUrl;
     
-    // Присваиваем именно очищенный coatUrl
     lens.style.backgroundImage = `url('${cleanCoatUrl}')`;
 
     function applyLensSize() {
-        // Вычисляем масштаб только если картинка имеет ширину больше 0
         if (img.clientWidth > 0) {
             lens.style.backgroundSize = `${img.clientWidth * 1.5}px`; 
         }
     }
 
-    
     if (img.complete) {
         applyLensSize();
     } else {
@@ -433,10 +403,105 @@ function initLoupeEffect(flagUrl, coatUrl, containerId, lensId, imgId) {
         lens.style.left = x + 'px';
         lens.style.top = y + 'px';
 
-        // Двигаем фон ВНУТРИ линзы
         const bgPosX = (x / img.clientWidth) * 100;
         const bgPosY = (y / img.clientHeight) * 100;
         
         lens.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
     };
 }
+
+// --- ЛОГИКА СТАРТОВОГО ЭКРАНА ---
+const startScreenDict = {
+    "rectangular": "Зеленый фон: символизирует густые леса Бразилии.",
+    "romb": "Желтый ромб: символизирует золото и богатство недр.",
+    "circle": "Синий круг: звездное небо над Рио-де-Жанейро 15 ноября 1889 года.",
+    "bend": "Белая лента",
+    "letters": "Девиз 'Ordem e Progresso' (Порядок и Прогресс).",
+    "sp": "Звезда Альфа Южного Креста (Акрукс): символизирует штат Сан-Паулу.",
+    "rj": "Звезда Бета Южного Креста (Мимоза): штат Рио-де-Жанейро.",
+    "ba": "Звезда Гамма Южного Креста (Гакрукс): штат Баия.",
+    "mg": "Звезда Дельта Южного Креста (Палида): штат Минас-Жерайс.",
+    "es": "Звезда Эпсилон Южного Креста: штат Эспириту-Санту.",
+    "sc": "Звезда Бета Южного Треугольника: штат Санта-Катарина.",
+    "rs": "Звезда Альфа Южного Треугольника: штат Риу-Гранди-ду-Сул.",
+    "pr": "Звезда Гамма Южного Треугольника: штат Парана.",
+    "go": "Звезда Канопус: штат Гояс.",
+    "mt": "Звезда Сириус: штат Мату-Гросу.",
+    "ms": "Звезда Альфард: штат Мату-Гросу-ду-Сул.",
+    "ac": "Звезда Гамма Гидры: штат Акри.",
+    "ro": "Звезда Ротанев: штат Рондония.",
+    "rr": "Звезда Суалокин: штат Рорайма.",
+    "to": "Звезда Канопус: штат Токантинс.",
+    "pa": "Звезда Спика: штат Пара (единственная звезда над лентой).",
+    "ap": "Звезда Акрукс 2: штат Амапа.",
+    "ma": "Звезда Граффиас (Скорпион): штат Мараньян.",
+    "pi": "Звезда Антарес (Скорпион): штат Пиауи.",
+    "ce": "Звезда Акамар (Скорпион): штат Сеара.",
+    "rn": "Звезда Саргас (Скорпион): штат Риу-Гранди-ду-Норти.",
+    "pb": "Звезда Вей (Скорпион): штат Параиба.",
+    "pe": "Звезда Шаула (Скорпион): штат Пернамбуку.",
+    "al": "Звезда Альниат (Скорпион): штат Алагоас.",
+    "se": "Звезда Альхена: штат Сержипи.",
+    "df": "Звезда Сигма Октанта (Полярная звезда Юга): Федеральный округ (Бразилиа)."
+};
+
+function initStartScreen() {
+    const hitboxes = document.querySelectorAll('#start-svg-flag .hitbox');
+    const infoText = document.getElementById('start-info-text');
+    const defaultText = "Наведите лупу на элементы флага";
+
+    hitboxes.forEach(box => {
+        box.addEventListener('mouseenter', (e) => {
+            e.stopPropagation(); 
+            const objectId = e.target.id || e.target.closest('g').id; 
+            
+            if (objectId) {
+                infoText.innerText = startScreenDict[objectId] || `Объект: ${objectId.toUpperCase()}`;
+            }
+        });
+        
+        box.addEventListener('mouseleave', () => {
+            infoText.innerText = defaultText;
+        });
+    });
+
+    initInlineSVGLoupe('start-zoom-container', 'start-lens', 'start-svg-flag');
+}
+
+function initInlineSVGLoupe(containerId, lensId, svgId) {
+    const container = document.getElementById(containerId);
+    const lens = document.getElementById(lensId);
+    const svg = document.getElementById(svgId);
+
+    if (!container || !lens || !svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const encodedData = encodeURIComponent(svgData);
+    const svgDataUrl = `data:image/svg+xml;utf8,${encodedData}`;
+    
+    lens.style.backgroundImage = `url('${svgDataUrl}')`;
+
+    function applyLensSize() {
+        if (container.clientWidth > 0) {
+            lens.style.backgroundSize = `${container.clientWidth * 1.5}px`; 
+        }
+    }
+    applyLensSize();
+    window.addEventListener('resize', applyLensSize);
+
+    container.onmousemove = function(e) {
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        lens.style.left = x + 'px';
+        lens.style.top = y + 'px';
+
+        const bgPosX = (x / container.clientWidth) * 100;
+        const bgPosY = (y / container.clientHeight) * 100;
+        
+        lens.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
+    };
+}
+
+initializeApp();
