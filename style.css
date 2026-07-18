@@ -126,7 +126,7 @@ body {
     background-color: #fcfcfc;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    padding: 20px;
+    padding: 10px;
     margin: 20px auto 0 auto;
     width: 100%;
     max-width: 500px;
@@ -157,7 +157,7 @@ body {
     object-fit: contain;
     border: 1px solid #ddd;
     border-radius: 4px;
-    margin-top: 15px;
+    margin-top: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     visibility: hidden;
 }
