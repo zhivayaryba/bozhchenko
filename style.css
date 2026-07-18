@@ -98,18 +98,24 @@ button {
     background: #004080;
 }
 
-* Оформление карточки информации */
+/* ВАЖНО: Лупа больше не будет перехватывать мышь! */
+#start-lens {
+    pointer-events: none; 
+}
+
+/* Оформление карточки информации */
 .info-card {
     background-color: #fcfcfc;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 20px;
-    margin-top: 20px;
-    min-height: 120px;
+    margin: 20px auto 0 auto; /* Центрируем сам контейнер по горизонтали */
+    min-height: 200px; /* Резервируем высоту для текста и флага */
+    max-width: 550px; /* Делаем контейнер аккуратным и узким */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* Прижимаем контент к верху, чтобы он не прыгал */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     text-align: center;
 }
@@ -120,17 +126,20 @@ button {
     font-size: 1.2rem;
     line-height: 1.5;
     color: #2c3e50;
-    margin: 0;
+    margin: 0 auto;
+    min-height: 55px; /* Резервируем место под 2-3 строки текста */
 }
 
 /* Флаг штата внутри контейнера */
 #start-info-flag {
-    width: 60px; /* Аккуратный размер миниатюры */
-    height: auto;
-    border: 1px solid #ccc;
+    width: 140px;
+    height: 98px; /* Жестко задаем высоту (пропорция ~7:10), чтобы ничего не прыгало */
+    object-fit: contain; /* Картинка аккуратно впишется в эти размеры */
+    border: 1px solid #ddd;
     border-radius: 4px;
     margin-top: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    visibility: hidden; /* По умолчанию скрыт, но МЕСТО ЗАНИМАЕТ */
 }
 
 .badge {
