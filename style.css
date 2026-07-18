@@ -365,3 +365,11 @@ CSS
     /* НОВОЕ: Запрещаем стандартные жесты браузера (скролл/зум) над флагом */
     touch-action: none; 
 }
+
+/* Эффект свечения для элемента */
+.active-hitbox {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8)) brightness(1.5);
+    stroke: white;
+    stroke-width: 2px;
+    transition: filter 0.2s ease, stroke 0.2s ease;
+}
